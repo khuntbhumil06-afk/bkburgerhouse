@@ -2,7 +2,7 @@
 session_start();
 include 'config.php';
 $q = mysqli_query($conn,"SELECT * FROM stats WHERE id=1");
-$row = mysqli_fetch_assoc($q);
+$row = mysqli_fetch_assoc($q) ?: ['happy_customers' => 0, 'burgers_sold' => 0];
 
 $happy = $row["happy_customers"];
 $sold = $row["burgers_sold"];
@@ -508,7 +508,7 @@ body{
                     <h1 class="hero-title">The Best <span class="text-highlight">Burgers</span> You'll Ever Taste!</h1>
                     <p class="hero-text">Fresh ingredients, juicy patties, and unforgettable flavors. Experience the ultimate burger experience with our handcrafted gourmet burgers.</p>
                     <div class="hero-buttons">
-                        <a href="#menu.php" onclick="ordernow()" class="btn btn-primary btn-lg me-3">Order Now</a>
+                        <a href="menu.php" onclick="ordernow()" class="btn btn-primary btn-lg me-3">Order Now</a>
                     </div>
                     <div class="hero-features mt-5">
                         <div class="row">
@@ -553,7 +553,7 @@ body{
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
                     <span class="section-subtitle">Today's Special</span>
-                    <h2 class="section-title text-white">Get 20% Off</span> Your First Order!</h2>
+                    <h2 class="section-title text-white">Get 20% Off Your First Order!</h2>
                     <p class="special-text">Use code <strong>BURGER20</strong> at checkout and enjoy a delicious discount on your first order. Don't miss out on this amazing deal!</p>
                     <a href="#" onclick="ordernow()" class="btn btn-primary btn-lg me-3">Order Now</a>
                 </div>
@@ -689,11 +689,11 @@ body{
             <div class="col-lg-2">
                 <h5>NewSubscribe</h5>
                 <form class="newsletter-form" action="newsletter.php" method="POST" onsubmit="return validateEmail()">
-                    <input type="name" id="name" name="name" placeholder="Enter Name">
+                    <input type="text" id="name" name="name" placeholder="Enter Name">
                     <div id="nameError" class="error"></div>
                     <input type="email" id="email" name="email" placeholder="Your Email">
                     <div id="emailError" class="error"></div>
-                    <input type="city" id="city" name="city" placeholder="Enter City">
+                    <input type="text" id="city" name="city" placeholder="Enter City">
                     <div id="cityError" class="error"></div>
                     <button type="submit" onclick="goToSuccess()">Subscribe</button>
                 </form>
@@ -816,7 +816,6 @@ function validateEmail() {
 
     return isValid;
 }
-</script>
 </script>
 </body>
 </html>

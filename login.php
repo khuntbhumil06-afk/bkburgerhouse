@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
                             if (trim($role) === 'admin') {
                                 $_SESSION['admin'] = 'YES';
-                                header("Location: sales.php");
+                                header("Location: dashboard.php");
                             } else {
                                 $_SESSION['admin'] = 'NO';
                                 header("Location: index.php");
