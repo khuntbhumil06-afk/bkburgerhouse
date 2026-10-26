@@ -73,47 +73,203 @@ if ($res) {
     }
 }
 
-// Cart submit
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// ---------- CART HELPERS ----------
+// Item cart ma umero. Same naam hoy to qty ane price vadhare, nahi to navi line
+function addToCart($name, $qty, $linePrice) {
+    $_SESSION['cartItemN'] = $_SESSION['cartItemN'] ?? [];
+    $_SESSION['cartItemQ'] = $_SESSION['cartItemQ'] ?? [];
+    $_SESSION['cartItemP'] = $_SESSION['cartItemP'] ?? [];
+
+    $pos = array_search($name, $_SESSION['cartItemN'], true);
+    if ($pos !== false) {
+        $_SESSION['cartItemQ'][$pos] += $qty;
+        $_SESSION['cartItemP'][$pos] += $linePrice;
+    } else {
+        $_SESSION['cartItemN'][] = $name;
+        $_SESSION['cartItemQ'][] = $qty;
+        $_SESSION['cartItemP'][] = $linePrice;
+    }
+}
+
+// Cart na badha totals pharithi gano
+function recalcCart() {
+    $totPrice      = array_sum($_SESSION['cartItemP'] ?? []);
+    $discount      = $totPrice * 0.20;
+    $afterDiscount = $totPrice - $discount;
+    $tax           = $afterDiscount * 0.20;
+
+    $_SESSION['total']         = $totPrice;
+    $_SESSION['discount']      = $discount;
+    $_SESSION['offerDiscount'] = 0;
+    $_SESSION['tax']           = $tax;
+    $_SESSION['netAmount']     = $afterDiscount + $tax;
+}
+
+// ---------- COMBO CUSTOMISE OPTIONS ----------
+// Format: 'Naam' => [extra price, emoji, (size mate description)]
+// Image mate: Assets/Store/options/<Naam>.png mukho (jem ke "Peri Peri Fries.png"). Na hoy to emoji dekhase
+$sizeOptions = [
+    'Regular' => [0,  '🥡', 'Standard portion'],
+    'Medium'  => [30, '🍱', 'Bigger portion'],
+    'Large'   => [60, '🛍️', 'Max portion'],
+];
+$friesOptions = [
+    'Regular French Fries' => [0,  '🍟'],
+    'Peri Peri Fries'      => [20, '🌶️'],
+    'Cheese Fries'         => [40, '🧀'],
+    'Potato Wedges'        => [30, '🥔'],
+];
+$drinkOptions = [
+    'Coke'         => [0,  '🥤'],
+    'Sprite'       => [0,  '🥤'],
+    'Fanta'        => [0,  '🧃'],
+    'Cold Coffee'  => [30, '☕'],
+    'Water Bottle' => [0,  '💧'],
+];
+$toppingOptions = [
+    'Extra Cheese'     => [20, '🧀'],
+    'Extra Patty'      => [40, '🍖'],
+    'Jalapeños'        => [15, '🌶️'],
+    'Extra Mayonnaise' => [10, '🥄'],
+    'Extra Veggies'    => [10, '🥬'],
+];
+
+// Option nu image shodho (options / drink / premium folder). Na malse to '' aapse
+function optionImage($name, $extensions) {
+    $names = [$name, strtr($name, ['ñ' => 'n'])];            // Jalapeños -> Jalapenos.png pan chalse
+    // Pehla tamara real photos (png/jpg/jpeg/webp) badhi folder ma, pachhi j svg
+    foreach ([$extensions, ['svg']] as $exts) {
+        foreach (["Assets/Store/options", "Assets/Store/drink", "Assets/Store/premium"] as $dir) {
+            foreach ($exts as $ext) {
+                foreach ($names as $nm) {
+                    $path = $dir . "/" . $nm . "." . $ext;
+                    if (is_file(__DIR__ . "/" . $path)) {
+                        return implode("/", array_map('rawurlencode', explode("/", $path)));
+                    }
+                }
+            }
+        }
+    }
+    return '';
+}
+
+function priceText($x, $free = 'Free') {
+    return $x > 0 ? '+₹' . (int)$x : $free;
+}
+
+// Ek option tile (image + naam + price). type = radio / checkbox
+function tileHtml($type, $inputName, $value, $label, $extra, $imgUrl, $emoji, $checked, $priceText, $attrs = '') {
+    $h  = '<label class="tile"' . $attrs . '>';
+    $h .= '<input type="' . $type . '" name="' . e($inputName) . '" value="' . e($value) . '" data-extra="' . (float)$extra . '"'
+        . ($checked ? ' checked' : '') . ' onchange="calcTotal()">';
+    $h .= '<span class="tile-img">' . ($imgUrl !== '' ? '<img src="' . e($imgUrl) . '" alt="">' : e($emoji)) . '</span>';
+    $h .= '<span class="tile-name">' . e($label) . '</span>';
+    $h .= '<span class="tile-price">' . e($priceText) . '</span>';
+    $h .= '<span class="tile-check">✓</span>';
+    $h .= '</label>';
+    return $h;
+}
+
+// Burger list (Veg + Non-Veg) menu mathi. Upgrade charge = potani category na sauthi sasta burger thi vadhare
+$burgers    = [];
+$minBurger  = null;
+foreach ($menu as $bId => $b) {
+    if ($b['category'] === 'Veg Burger' || $b['category'] === 'Non-Veg Burger') {
+        $burgers[$bId] = $b;
+        $pr = (float)$b['price'];
+        if ($minBurger === null || $pr < $minBurger) {
+            $minBurger = $pr;
+        }
+    }
+}
+$burgerExtra = [];
+foreach ($burgers as $bId => $b) {
+    $burgerExtra[$bId] = max(0, (float)$b['price'] - $minBurger);
+}
+
+// Customised combo cart ma add karo (price server par j gane chhe)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'custom_combo') {
+    $cid   = (int)($_POST['combo_id'] ?? 0);
+    $bid   = (int)($_POST['burger_id'] ?? 0);
+    $size  = $_POST['size'] ?? '';
+    $fries = $_POST['fries'] ?? '';
+    $drink = $_POST['drink'] ?? '';
+    $tops  = $_POST['toppings'] ?? [];
+    $qty   = max(1, min(20, (int)($_POST['qty'] ?? 1)));
+    if (!is_array($tops)) {
+        $tops = [];
+    }
+
+    $ok = isset($menu[$cid]) && $menu[$cid]['category'] === 'Combo'
+          && isset($sizeOptions[$size])
+          && isset($friesOptions[$fries])
+          && isset($drinkOptions[$drink]);
+
+    $burgerName = '';
+    $burgerAdd  = 0;
+    if ($ok && $burgers) {
+        if (isset($burgers[$bid])) {
+            $burgerName = $burgers[$bid]['name'];
+            $burgerAdd  = $burgerExtra[$bid];
+        } else {
+            $ok = false;
+        }
+    }
+
+    $topNames = [];
+    $topExtra = 0;
+    if ($ok) {
+        foreach ($tops as $t) {
+            if (isset($toppingOptions[$t]) && !in_array($t, $topNames, true)) {
+                $topNames[] = $t;
+                $topExtra  += $toppingOptions[$t][0];
+            }
+        }
+    }
+
+    if ($ok) {
+        $unit = (float)$menu[$cid]['price'] + $burgerAdd
+              + $sizeOptions[$size][0] + $friesOptions[$fries][0] + $drinkOptions[$drink][0] + $topExtra;
+
+        $parts = [$size];
+        if ($burgerName !== '') {
+            $parts[] = $burgerName;
+        }
+        $parts[] = $fries;
+        $parts[] = $drink;
+        if ($topNames) {
+            $parts[] = '+' . implode(', +', $topNames);
+        }
+        $label = $menu[$cid]['name'] . ' (' . implode(', ', $parts) . ')';
+
+        addToCart($label, $qty, $unit * $qty);
+        recalcCart();
+
+        header("location: cart.php");
+        exit();
+    }
+}
+
+// Normal items cart ma add karo (junu cart rahese)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'custom_combo') {
     $qtys = $_POST['qty'] ?? [];
     if (!is_array($qtys)) {
         $qtys = [];
     }
 
-    $cartItemN = [];
-    $cartItemQ = [];
-    $cartItemP = [];
-
+    $added = false;
     foreach ($qtys as $id => $qty) {
         $id  = (int)$id;
         $qty = (int)$qty;
 
         if ($qty > 0 && isset($menu[$id])) {
-            $cartItemN[] = $menu[$id]['name'];
-            $cartItemQ[] = $qty;
-            $cartItemP[] = $qty * (float)$menu[$id]['price'];
+            addToCart($menu[$id]['name'], $qty, $qty * (float)$menu[$id]['price']);
+            $added = true;
         }
     }
 
-    $totPrice = array_sum($cartItemP);
-
-    if ($totPrice > 0) {
-        $discount      = $totPrice * 0.20;
-        $offerDiscount = 0;
-        $afterDiscount = $totPrice - $discount;
-        $tax           = $afterDiscount * 0.20;
-        $netAmount     = $afterDiscount + $tax;
-
-        $_SESSION["cartItemN"] = $cartItemN;
-        $_SESSION["cartItemQ"] = $cartItemQ;
-        $_SESSION["cartItemP"] = $cartItemP;
-
-        $_SESSION["total"]         = $totPrice;
-        $_SESSION["discount"]      = $discount;
-        $_SESSION["offerDiscount"] = $offerDiscount;
-        $_SESSION["tax"]           = $tax;
-        $_SESSION["netAmount"]     = $netAmount;
-
+    if ($added) {
+        recalcCart();
         header("location: cart.php");
         exit();
     }
@@ -456,12 +612,330 @@ body {
     background: red;
     color: white;
 }
+.customise-btn {
+    margin-top: 8px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.customise-btn:hover {
+    background: gold;
+    color: black;
+}
 .empty-msg {
     text-align: center;
     padding: 40px;
     font-size: 18px;
 }
 .hidden { display: none; }
+
+/* ---------- CUSTOMISE POPUP : "Combo Ticket" design ---------- */
+.modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    box-sizing: border-box;
+}
+.modal-bg.show { display: flex; }
+
+.cm-box {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    width: 100%;
+    max-width: 920px;
+    height: min(660px, 94vh);
+    background: #14110f;
+    color: #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* ----- Left: order ticket ----- */
+.cm-ticket {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 22px 22px 18px;
+    background: #fff3d6;
+    color: #2b2118;
+    font-family: "Courier New", monospace;
+}
+.cm-ticket::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; right: -1px;
+    width: 10px;
+    background: radial-gradient(circle at 10px 8px, #14110f 6px, transparent 6.5px) 0 0 / 10px 16px repeat-y;
+}
+.tk-top {
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed #c9b88f;
+}
+.tk-top img {
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 3px #e63946, 0 8px 18px rgba(0,0,0,0.25);
+}
+.tk-top small {
+    display: block;
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #e63946;
+    font-weight: bold;
+}
+.tk-top h2 {
+    margin: 4px 0 2px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+.tk-top .cm-base { font-size: 12px; color: #7a6a4f; }
+
+.tk-receipt {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin: 8px 0;
+}
+.rc-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed #d8c9a3;
+}
+.rc-line small {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9a8a6c;
+}
+.rc-line b { color: #c1121f; white-space: nowrap; align-self: center; }
+
+.tk-bottom { display: flex; flex-direction: column; gap: 10px; }
+.tk-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 2px solid #2b2118;
+    padding-top: 8px;
+}
+.tk-total .small { font-size: 12px; letter-spacing: 2px; font-weight: bold; }
+.tk-total .total { font-size: 30px; font-weight: bold; color: #c1121f; font-family: Arial, sans-serif; }
+.cm-qty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 2px solid #2b2118;
+    border-radius: 30px;
+    padding: 3px;
+}
+.cm-qty button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: #2b2118;
+    color: #ffb703;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.cm-qty span { font-weight: bold; font-family: Arial, sans-serif; }
+.cm-add {
+    background: #e63946;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #9d0208;
+    transition: 0.15s;
+}
+.cm-add:hover { background: #f1485a; }
+.cm-add:active { transform: translateY(4px); box-shadow: 0 1px 0 #9d0208; }
+
+/* ----- Right: options ----- */
+.cm-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: radial-gradient(circle at 85% -10%, #3a2217 0%, #14110f 55%);
+}
+.cm-main-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px 4px 28px;
+}
+.cm-main-head h3 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+}
+.cm-main-head h3 span { color: #ffb703; }
+.cm-main-head small { display: block; font-size: 12px; color: #a99888; margin-top: 2px; }
+.cm-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: #2a221d;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+}
+.cm-close:hover { background: #e63946; }
+
+.cm-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 24px 22px 28px;
+}
+.cm-body::-webkit-scrollbar { width: 6px; }
+.cm-body::-webkit-scrollbar-thumb { background: #4a3d34; border-radius: 6px; }
+
+.cm-sec { margin-top: 20px; }
+.cm-sec h4 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 12px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.cm-sec h4 .num {
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px #ffb703;
+}
+.cm-sec h4 .num::before { content: "0"; }
+.cm-sec h4 em {
+    margin-left: auto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #a99888;
+}
+
+.tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 10px 8px;
+}
+.tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    padding: 8px 4px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.tile:hover { background: rgba(255,255,255,0.05); }
+.tile input { position: absolute; opacity: 0; pointer-events: none; }
+.tile-img {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    background: #221c18;
+    border: 3px solid #3a302a;
+    overflow: hidden;
+    transition: 0.25s;
+}
+.tile-img img { width: 100%; height: 100%; object-fit: cover; }
+.tile-name { font-size: 12px; font-weight: bold; line-height: 1.2; }
+.tile-price {
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: #2a221d;
+    color: #ffb703;
+}
+.tile-check {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffb703;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+.tile:has(input:checked) .tile-img {
+    border-color: #ffb703;
+    transform: scale(1.08);
+    box-shadow: 0 0 0 4px rgba(255,183,3,0.22), 0 10px 22px rgba(255,183,3,0.28);
+}
+.tile:has(input:checked) .tile-price { background: #ffb703; color: #000; font-weight: bold; }
+.tile:has(input:checked) .tile-check { display: flex; }
+
+/* ----- Mobile: ticket niche bar ban jay ----- */
+@media (max-width: 720px) {
+    .modal-bg { padding: 0; }
+    .cm-box {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+    }
+    .cm-main { order: 1; }
+    .cm-ticket { order: 2; padding: 12px 14px; }
+    .cm-ticket::after, .tk-top, .tk-receipt { display: none; }
+    .tk-bottom { flex-direction: row; align-items: center; gap: 10px; }
+    .tk-total { border: none; padding: 0; flex-direction: column; align-items: flex-start; }
+    .tk-total .total { font-size: 22px; }
+    .cm-qty { gap: 2px; }
+    .cm-add { flex: 1; padding: 12px 8px; font-size: 13px; }
+    .cm-body { padding: 0 14px 16px; }
+    .cm-main-head { padding: 14px 14px 4px; }
+    .tile-grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+}
 </style>
 </head>
 
@@ -524,6 +998,7 @@ body {
             $meta    = $categoryMeta[$p['category']];
             $imgPath = itemImage($p['name'], $meta['folder'], $imageExtensions);
             $isDrink = ($p['category'] === 'Drink');
+            $isCombo = ($p['category'] === 'Combo');
         ?>
         <div class="food <?= e($meta['class']) ?>">
             <img src="<?= e($imgPath) ?>" alt="<?= e($p['name']) ?>">
@@ -534,14 +1009,24 @@ body {
                 <div class="rating"><?= ratingHtml(itemRating($p['name'])) ?></div>
             <?php endif; ?>
 
-            <div class="qty-box">
-                <input type="hidden" id="qty_<?= $id ?>" name="qty[<?= $id ?>]" value="0">
-                <button type="button" onclick="minus(<?= $id ?>)">-</button>
-                <span id="qty_<?= $id ?>_txt">0</span>
-                <button type="button" onclick="plus(<?= $id ?>)">+</button>
-            </div>
+            <?php if (!$isCombo): ?>
+                <div class="qty-box">
+                    <input type="hidden" id="qty_<?= $id ?>" name="qty[<?= $id ?>]" value="0">
+                    <button type="button" onclick="minus(<?= $id ?>)">-</button>
+                    <span id="qty_<?= $id ?>_txt">0</span>
+                    <button type="button" onclick="plus(<?= $id ?>)">+</button>
+                </div>
+                <button type="submit" class="add-btn">Add to Cart</button>
+            <?php else: ?>
+                <button type="button" class="add-btn"
+                        data-id="<?= (int)$id ?>"
+                        data-name="<?= e($p['name']) ?>"
+                        data-price="<?= e($p['price']) ?>"
+                        data-img="<?= e($imgPath) ?>"
+                        data-type="<?= (stripos($p['name'], 'non') !== false || stripos($p['name'], 'chicken') !== false) ? 'nonveg' : ((stripos($p['name'], 'veg') !== false) ? 'veg' : 'all') ?>"
+                        onclick="openCustomise(this)">Add+</button>
+            <?php endif; ?>
 
-            <button type="submit" class="add-btn">Add to Cart</button>
             <button type="button" class="wishlist-btn" data-name="<?= e($p['name']) ?>" onclick="addToWishlist(this)">❤️ Wishlist</button>
         </div>
         <?php endforeach; ?>
@@ -552,6 +1037,109 @@ body {
 
 <br><br>
 </form>
+
+<!-- ---------- CUSTOMISE POPUP (main form ni bahar) ---------- -->
+<div class="modal-bg" id="customModal">
+  <form method="post" class="cm-box" id="cmForm">
+    <input type="hidden" name="action" value="custom_combo">
+    <input type="hidden" name="combo_id" id="cm_id">
+    <input type="hidden" name="qty" id="cm_qty" value="1">
+
+    <!-- Left: live order ticket -->
+    <aside class="cm-ticket">
+      <div class="tk-top">
+        <img id="cm_img" src="" alt="">
+        <small>COMBO ORDER</small>
+        <h2 id="cm_name"></h2>
+        <span class="cm-base">Base price ₹<span id="cm_base">0</span></span>
+      </div>
+
+      <div class="tk-receipt" id="cm_lines"></div>
+
+      <div class="tk-bottom">
+        <div class="tk-total">
+          <span class="small">TOTAL</span>
+          <span class="total">₹<span id="cm_total">0</span></span>
+        </div>
+        <div class="cm-qty">
+          <button type="button" onclick="cmQty(-1)">-</button>
+          <span id="cm_qty_txt">1</span>
+          <button type="button" onclick="cmQty(1)">+</button>
+        </div>
+        <button type="submit" class="cm-add">Add to Cart</button>
+      </div>
+    </aside>
+
+    <!-- Right: options -->
+    <div class="cm-main">
+      <div class="cm-main-head">
+        <div>
+          <h3>Build your <span>combo</span></h3>
+          <small id="cm_name2"></small>
+        </div>
+        <button type="button" class="cm-close" onclick="closeCustomise()">&times;</button>
+      </div>
+
+      <div class="cm-body">
+
+        <?php if ($burgers): ?>
+        <section class="cm-sec">
+          <h4><span class="num">1</span> Choose Your Burger <em>Upgrade ma extra charge</em></h4>
+          <div class="tile-grid">
+            <?php foreach ($burgers as $bId => $b):
+                $bx = $burgerExtra[$bId];
+                $bImg = itemImage($b['name'], $categoryMeta[$b['category']]['folder'], $imageExtensions);
+                echo tileHtml('radio', 'burger_id', $bId, $b['name'], $bx, $bImg, '🍔', false,
+                              priceText($bx, 'Free'),
+                              ' data-burger="1" data-type="' . ($b['category'] === 'Veg Burger' ? 'veg' : 'nonveg') . '"');
+            endforeach; ?>
+          </div>
+        </section>
+        <?php endif; ?>
+
+        <section class="cm-sec">
+          <h4><span class="num">2</span> Choose Your Sides</h4>
+          <div class="tile-grid">
+            <?php $first = true; foreach ($friesOptions as $n => $o):
+                echo tileHtml('radio', 'fries', $n, $n, $o[0], optionImage($n, $imageExtensions), $o[1], $first, priceText($o[0]));
+                $first = false;
+            endforeach; ?>
+          </div>
+        </section>
+
+        <section class="cm-sec">
+          <h4><span class="num">3</span> Choose Your Drink</h4>
+          <div class="tile-grid">
+            <?php $first = true; foreach ($drinkOptions as $n => $o):
+                echo tileHtml('radio', 'drink', $n, $n, $o[0], optionImage($n, $imageExtensions), $o[1], $first, priceText($o[0], 'Free'));
+                $first = false;
+            endforeach; ?>
+          </div>
+        </section>
+
+        <section class="cm-sec">
+          <h4><span class="num">4</span> Extra Toppings <em>Ek thi vadhare pasand kari shako</em></h4>
+          <div class="tile-grid">
+            <?php foreach ($toppingOptions as $n => $o):
+                echo tileHtml('checkbox', 'toppings[]', $n, $n, $o[0], optionImage($n, $imageExtensions), $o[1], false, priceText($o[0]));
+            endforeach; ?>
+          </div>
+        </section>
+
+        <section class="cm-sec">
+          <h4><span class="num">5</span> Combo Size</h4>
+          <div class="tile-grid">
+            <?php $first = true; foreach ($sizeOptions as $n => $o):
+                echo tileHtml('radio', 'size', $n, $n, $o[0], optionImage('size-' . $n, $imageExtensions), $o[1], $first, priceText($o[0], 'Regular price'));
+                $first = false;
+            endforeach; ?>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </form>
+</div>
 
 <script>
 function filterSelection(category) {
@@ -609,6 +1197,105 @@ function addToWishlist(btn) {
         alert("Already in Wishlist!");
     }
 }
+
+/* ---------- Customise popup ---------- */
+let cmBase = 0;
+
+function openCustomise(btn) {
+    cmBase = parseFloat(btn.dataset.price);
+
+    document.getElementById("cmForm").reset();   // fries/drink/size pacha pehla option par, toppings band
+    document.getElementById("cm_id").value = btn.dataset.id;
+    document.getElementById("cm_name").textContent = btn.dataset.name;
+    document.getElementById("cm_img").src = btn.dataset.img;
+    document.getElementById("cm_base").textContent = cmBase;
+    document.getElementById("cm_qty").value = 1;
+    document.getElementById("cm_qty_txt").textContent = 1;
+    document.querySelector("#cmForm .cm-body").scrollTop = 0;
+
+    // Combo na type vala burger pehla, pachhi bija. Maximum 6 burger batavo
+    const firstTile = document.querySelector("#cmForm .tile[data-burger]");
+    if (firstTile) {
+        const grid = firstTile.parentElement;
+        const tiles = Array.from(grid.querySelectorAll(".tile[data-burger]"));
+        tiles.forEach((t, i) => { if (t.dataset.idx === undefined) t.dataset.idx = i; });
+
+        const type = btn.dataset.type;
+        const rank = t => (type === "all" || t.dataset.type === type) ? 0 : 1;
+        tiles.sort((x, y) => rank(x) - rank(y) || (x.dataset.idx - y.dataset.idx));
+
+        tiles.forEach((t, i) => {
+            grid.appendChild(t);
+            t.style.display = i < 6 ? "flex" : "none";
+            t.querySelector("input").checked = (i === 0);
+        });
+    }
+
+    calcTotal();
+    document.getElementById("customModal").classList.add("show");
+}
+
+function closeCustomise() {
+    document.getElementById("customModal").classList.remove("show");
+}
+
+function cmQty(d) {
+    const q = document.getElementById("cm_qty");
+    const n = Math.max(1, Math.min(20, parseInt(q.value) + d));
+    q.value = n;
+    document.getElementById("cm_qty_txt").textContent = n;
+    calcTotal();
+}
+
+function calcTotal() {
+    let extra = 0;
+    document.querySelectorAll("#cmForm input[data-extra]:checked").forEach(i => {
+        extra += parseFloat(i.dataset.extra) || 0;
+    });
+    const qty = parseInt(document.getElementById("cm_qty").value);
+    document.getElementById("cm_total").textContent = Math.round((cmBase + extra) * qty);
+    updateTicket(qty);
+}
+
+// Left ticket ma pasand kareli vastu live batavo
+function updateTicket(qty) {
+    const box = document.getElementById("cm_lines");
+    if (!box) return;
+    box.textContent = "";
+
+    const addLine = (label, text, price) => {
+        const row = document.createElement("div");
+        row.className = "rc-line";
+        const left = document.createElement("span");
+        const sm = document.createElement("small");
+        sm.textContent = label;
+        left.appendChild(sm);
+        left.appendChild(document.createTextNode(text));
+        const right = document.createElement("b");
+        right.textContent = price;
+        row.appendChild(left);
+        row.appendChild(right);
+        box.appendChild(row);
+    };
+
+    const name = document.getElementById("cm_name").textContent;
+    document.getElementById("cm_name2").textContent = name;
+    addLine("Combo", name, "₹" + cmBase);
+
+    const groups = [["size", "Size"], ["burger_id", "Burger"], ["fries", "Side"], ["drink", "Drink"], ["toppings[]", "Topping"]];
+    groups.forEach(g => {
+        document.querySelectorAll('#cmForm input[name="' + g[0] + '"]:checked').forEach(i => {
+            const text = i.closest(".tile").querySelector(".tile-name").textContent;
+            const x = parseFloat(i.dataset.extra) || 0;
+            addLine(g[1], text, x > 0 ? "+₹" + x : "Free");
+        });
+    });
+    addLine("Quantity", "× " + qty, "");
+}
+
+document.getElementById("customModal").addEventListener("click", function (e) {
+    if (e.target === this) closeCustomise();
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     const btn = document.getElementById("profileBtn");

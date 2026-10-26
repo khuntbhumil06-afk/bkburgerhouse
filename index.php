@@ -490,6 +490,7 @@ body{
                     <img src="<?php echo $img; ?>" id="profileBtn">
                     <div class="dropdown" id="dropMenu">
                         <a href="account.php">Account</a>
+                        <a href="my_orders.php">My Order</a>
                         <a href="wishlist.php">Wishlist</a>
                         <a href="logout.php">Logout</a>
                     </div>

@@ -3,529 +3,446 @@ session_start();
 include 'config.php';
 
 $success = "";
+$error   = "";
 
-if(isset($_POST['send']))
-{
-    $name    = htmlspecialchars($_POST['name']);
-    $email   = htmlspecialchars($_POST['email']);
-    $subject = htmlspecialchars($_POST['subject']);
-    $message = htmlspecialchars($_POST['message']);
+function h($v) {
+    return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+}
 
-    $sql = "INSERT INTO contact_messages (name, email, subject, message)
-            VALUES ('$name', '$email', '$subject', '$message')";
+// ---------- Contact form (prepared statement, SQL injection safe) ----------
+if (isset($_POST['send'])) {
+    $name    = htmlspecialchars(trim($_POST['name']    ?? ''));
+    $email   = htmlspecialchars(trim($_POST['email']   ?? ''));
+    $subject = htmlspecialchars(trim($_POST['subject'] ?? ''));
+    $message = htmlspecialchars(trim($_POST['message'] ?? ''));
 
-    if($conn->query($sql) === TRUE){
-        header("Location: index.php?msg=sent");
-        exit();
+    if ($name === '' || $email === '' || $subject === '' || $message === '') {
+        $error = "Please fill all the fields.";
+    } elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
     } else {
-        echo "Error: " . $conn->error;
+        $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param("ssss", $name, $email, $subject, $message);
+            if ($stmt->execute()) {
+                $stmt->close();
+                header("Location: index.php?msg=sent");
+                exit();
+            }
+            $error = "Sorry, message could not be sent. Please try again.";
+            $stmt->close();
+        } else {
+            $error = "Sorry, something went wrong. Please try again.";
+        }
     }
 }
 
-$img = "uploads/default.png"; 
+// ---------- Profile image ----------
+$img = "uploads/default.png";
 
-if(isset($_SESSION['username'])){
-    include 'config.php';
+if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
 
-    $sql = "SELECT image FROM loginform WHERE username=?";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $username);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $user_img);
-    mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
+    $stmt = mysqli_prepare($conn, "SELECT image FROM loginform WHERE username=?");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $username);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_bind_result($stmt, $user_img);
+        mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
 
-    if(!empty($user_img)){
-        $img = "uploads/".$user_img;
+        if (!empty($user_img)) {
+            $img = "uploads/" . $user_img;
+        }
     }
 }
+
+$mapLink = "https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.2394624,72.8443551,5186m/data=!3m1!1e3!4m10!1m2!2m1!1sajay's+burger!3m6!1s0x3be04f838741b843:0x436df813b3079b08!8m2!3d21.239469!4d72.8803962!15sCg1hamF5J3MgYnVyZ2VyWg8iDWFqYXkncyBidXJnZXKSARRmYXN0X2Zvb2RfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOUE1TMTZWa3AzRUFF4AEA-gEECAAQSg!16s%2Fg%2F11nc9gy0jb?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D";
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Contact Us - Burger House</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - Burger House</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-         body{
-    font-family: Arial;
-    background:url('Assets/images.png') no-repeat center center fixed;
-    background-size: cover;
-    color:white;
-    margin:0;
+<style>
+:root {
+    --bg: #0f0d0c;
+    --card: #1a1613;
+    --card2: #241d18;
+    --ink: #fff7ec;
+    --muted: #a39384;
+    --red: #e63946;
+    --red2: #9d0208;
+    --gold: #ffb703;
+    --line: #2f2620;
+    --paper: #fff3d6;
+    --paper-ink: #2b2118;
 }
-
-        .brand{
-    color:#fff;
-    font-size:22px;
-    font-weight:600;
-    display:flex;
-    align-items:center;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 8% -5%, rgba(230,57,70,.28), transparent 38%),
+        radial-gradient(circle at 100% 40%, rgba(255,183,3,.12), transparent 40%),
+        var(--bg);
+    background-attachment: fixed;
+    overflow-x: hidden;
 }
+a { color: inherit; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-.brand img{
-    width:34px;
-    margin-right:10px;
+/* ---------- NAV ---------- */
+.nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0,0,0,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
 }
-        .profile {
-    position: relative;
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1.5px; }
+.brand img { width: 38px; height: 38px; object-fit: contain; }
+.brand span { color: var(--gold); }
+.links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.links > a {
+    text-decoration: none; font-weight: 600; font-size: 14px;
+    padding: 8px 14px; border-radius: 999px; transition: .2s;
 }
-
-.profile img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
+.links > a:hover { background: var(--gold); color: #000; }
+.links > a.active { background: var(--red); }
+.profile { position: relative; margin-left: 8px; }
+.profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); cursor: pointer; display: block; }
 .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 50px;
-    background: red;
-    width: 140px;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    display: none; position: absolute; right: 0; top: 52px; min-width: 150px;
+    background: var(--red); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
 }
-.contact-title-box{
-    margin:50px auto;
-    width: fit-content;
-    padding:25px 50px;
-    border-radius:20px;
-    text-align:center;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #ff4d4d, #ff944d);
-    color:#fff;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    opacity: 0;
-    transform: translateY(-100px);
-    transition: all 0.7s ease;
-    animation: zoomInOut 4s ease-in-out infinite;
+.dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; }
+.dropdown a:hover { background: var(--red2); }
+
+/* ---------- HERO ---------- */
+.hero { position: relative; padding: 70px 0 54px; text-align: center; }
+.hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; }
+.hero h1 {
+    font-family: 'Bebas Neue', sans-serif; font-weight: 400;
+    font-size: clamp(64px, 14vw, 150px); line-height: .88; letter-spacing: 3px; margin: 8px 0 14px;
 }
-@keyframes zoomInOut {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-    100% { transform: scale(1); }
+.hero h1 span { color: transparent; -webkit-text-stroke: 2px var(--red); }
+.hero p.sub { max-width: 520px; margin: 0 auto 26px; color: var(--muted); line-height: 1.6; }
+.quick { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer;
+    font-family: inherit; font-weight: 800; font-size: 14px; border: none;
+    padding: 13px 26px; border-radius: 999px; transition: .15s;
+}
+.btn.gold { background: var(--gold); color: #000; box-shadow: 0 4px 0 #b37f00; }
+.btn.ghost { border: 2px solid var(--gold); color: var(--gold); background: transparent; }
+.btn.ghost:hover { background: var(--gold); color: #000; }
+.btn.gold:active { transform: translateY(3px); box-shadow: 0 1px 0 #b37f00; }
+.float { position: absolute; font-size: 54px; animation: floaty 5s ease-in-out infinite; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.float.f1 { top: 60px; left: 6%; }
+.float.f2 { top: 150px; right: 7%; animation-delay: 1.2s; }
+.float.f3 { bottom: 30px; left: 14%; animation-delay: 2.1s; font-size: 40px; }
+.float.f4 { bottom: 50px; right: 15%; animation-delay: .6s; font-size: 44px; }
+@keyframes floaty {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-16px) rotate(6deg); }
 }
 
-.contact-title-box.show{
-    opacity: 1;
-    transform: translateY(0);
+/* ---------- MARQUEE ---------- */
+.marquee { background: var(--red); transform: rotate(-1.2deg); margin: 10px -20px 0; overflow: hidden; border-block: 3px solid #000; }
+.marquee div {
+    display: inline-block; white-space: nowrap; padding: 10px 0;
+    font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px;
+    animation: slide 22s linear infinite;
 }
+@keyframes slide { to { transform: translateX(-50%); } }
 
-.contact-title-box h1{
-    margin:0;
-    font-size:55px;
-    font-weight:bold;
-    color:#fff;
+/* ---------- MAIN GRID ---------- */
+.grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 28px; padding: 64px 0 40px; align-items: start; }
+.stack { display: grid; gap: 16px; }
+.info {
+    background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 20px 22px;
+    display: flex; gap: 16px; transition: .25s;
 }
+.info:hover { transform: translateX(6px); border-color: var(--gold); }
+.info .ico {
+    flex: 0 0 52px; height: 52px; border-radius: 50%; background: var(--card2);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--gold);
+    box-shadow: inset 0 0 0 2px rgba(255,183,3,.35);
+}
+.info h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 26px; letter-spacing: 1.5px; margin-bottom: 4px; }
+.info p, .info a { color: var(--muted); font-size: 14px; line-height: 1.6; text-decoration: none; }
+.info a:hover { color: var(--gold); }
 
-.contact-title-box::before{
-    content:'';
-    position:absolute;
-    width:200px;
-    height:200px;
-    background: rgba(255,255,255,0.2);
-    border-radius:50%;
-    top:-60px;
-    left:-60px;
-}
+.status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 999px; margin-bottom: 10px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1.4s infinite; }
+.status.open { color: #4ade80; background: rgba(74,222,128,.12); }
+.status.closed { color: #f87171; background: rgba(248,113,113,.12); }
+@keyframes blink { 50% { opacity: .25; } }
+.hours { width: 100%; font-size: 14px; border-collapse: collapse; }
+.hours td { padding: 6px 0; color: var(--muted); border-bottom: 1px dashed var(--line); }
+.hours td:last-child { text-align: right; }
+.hours tr.today td { color: var(--gold); font-weight: 800; }
 
-.contact-title-box::after{
-    content:'';
-    position:absolute;
-    width:150px;
-    height:150px;
-    background: rgba(255,255,255,0.15);
-    border-radius:50%;
-    bottom:-50px;
-    right:-50px;
+/* ---------- MESSAGE SLIP (form) ---------- */
+.slip {
+    position: relative; background: var(--paper); color: var(--paper-ink);
+    border-radius: 24px; padding: 34px 32px 30px; box-shadow: 0 20px 50px rgba(0,0,0,.55);
 }
+.slip::before, .slip::after {
+    content: ""; position: absolute; top: 74px; width: 28px; height: 28px; border-radius: 50%; background: var(--bg);
+}
+.slip::before { left: -14px; }
+.slip::after  { right: -14px; }
+.slip .tag { font-size: 11px; letter-spacing: 3px; font-weight: 800; color: var(--red); }
+.slip h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 46px; letter-spacing: 1.5px; line-height: 1; margin: 4px 0 18px; }
+.slip .cut { border-top: 2px dashed #c9b88f; margin: 0 -32px 20px; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #7a6a4f; margin-bottom: 4px; }
+.field input, .field textarea {
+    width: 100%; background: transparent; border: none; border-bottom: 2px solid #c9b88f;
+    padding: 8px 2px; font-family: inherit; font-size: 15px; color: var(--paper-ink); outline: none; transition: .2s; resize: vertical;
+}
+.field input:focus, .field textarea:focus { border-bottom-color: var(--red); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 0; }
+.chips button {
+    font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+    background: #fff; border: 2px solid #e0d1ab; color: var(--paper-ink);
+    padding: 5px 13px; border-radius: 999px; transition: .15s;
+}
+.chips button:hover, .chips button.on { background: var(--red); border-color: var(--red); color: #fff; }
+.send {
+    width: 100%; margin-top: 8px; border: none; cursor: pointer;
+    background: var(--red); color: #fff; font-family: inherit; font-weight: 800; font-size: 16px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 15px; border-radius: 14px; box-shadow: 0 5px 0 var(--red2); transition: .15s;
+}
+.send:hover { background: #f1485a; }
+.send:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--red2); }
+.alert { padding: 11px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+.alert.err { background: #fee2e2; color: #7f1d1d; }
+.alert.ok  { background: #dcfce7; color: #14532d; }
 
-.contact-title-box:hover{
-    transform: scale(1.05);
-    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+/* ---------- MAP ---------- */
+.mapsec { padding: 30px 0 70px; }
+.mapcard { position: relative; border-radius: 26px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+.mapcard iframe { display: block; width: 100%; height: 400px; border: 0; filter: grayscale(.25) contrast(1.05); }
+.maplabel {
+    position: absolute; left: 20px; bottom: 20px; max-width: 290px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6);
 }
+.maplabel h4 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 24px; letter-spacing: 1.5px; }
+.maplabel p { font-size: 13px; color: var(--muted); margin: 4px 0 12px; line-height: 1.5; }
+.maplabel .btn { padding: 9px 18px; font-size: 13px; }
 
-@keyframes zoomInOut {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+/* ---------- FOOTER ---------- */
+.footer { background: #000; border-top: 4px solid var(--red); padding: 54px 0 28px; }
+.fgrid { display: grid; grid-template-columns: 1.3fr .8fr 1.3fr 1.2fr; gap: 30px; }
+.footer h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: 1.5px; margin-bottom: 10px; }
+.footer h5 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 22px; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 12px; }
+.footer p, .footer li, .footer a { font-size: 14px; color: #cfc4b8; line-height: 1.7; text-decoration: none; }
+.footer ul { list-style: none; }
+.footer a:hover { color: var(--gold); }
+.social { display: flex; gap: 10px; margin-top: 14px; }
+.social a {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--card2);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; transition: .2s;
 }
-
-@media(max-width:768px){
-    h1 {
-        font-size: 40px;
-    }
-}
-
-.info-box{
-    background:#f5f5f5;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
-    transition:0.3s;
-}
-
-.info-box{
-    opacity: 0;
-    transform: translateY(100px);
-    transition: all 0.6s ease;
-}
-
-.info-box.show{
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.info-box:hover{
-    transform:translateY(-5px);
-}
-
-.icon-circle{
-    width:60px;
-    height:60px;
-    background:#f4c7b5;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin:0 auto 10px;
-    font-size:25px;
-}
-        .nav-container{
-            background:#000;
-            padding:10px 20px;
-        }
-        .nav-container ul{
-            list-style:none;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin:0;
-        }
-        .nav-container li{
-            display:inline;
-            margin-right:15px;
-        }
-        .nav-container a{
-            color:white;
-            text-decoration:none;
-            font-weight:bold;
-        }
-        .brand{
-            color:#ffc107;
-            font-size:20px;
-            font-weight:bold;
-        }
-        .contact-form-wrapper{
-    background:#fff;
-    padding:25px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-    opacity: 0;
-    transform: translateX(200px) scale(0.9);
-    transition: all 0.7s ease;
-}
-.contact-form-wrapper.show{
-    opacity: 1;
-    transform: translateX(0) scale(1);
-}
-        @keyframes slideRight{
-        from{
-        transform: translateX(200px);
-        opacity:0;
-        }
-        to{
-        transform: translateX(0);
-        opacity:1;
-        }
-        }
-        .contact-form-wrapper:hover{
-    transform: scale(1.05);
-    box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
-
-        .contact-info{
-            background:#fff;
-            padding:25px;
-            border-radius:10px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
-        }
-        .contact-item{
-            margin-bottom:20px;
-        }
-
-        .map-container{
-    opacity: 0;
-    transform: translateX(-200px);
-    transition: all 0.7s ease;
-}
-
-.map-container.show{
-    opacity: 1;
-    transform: translateX(0);
-}
-
-        .footer{
-    background:#111;
-    color:#fff;
-}
-
-.footer h3,
-.footer h5{
-    color:#fff;
-    margin-bottom:15px;
-}
-
-.footer p{
-    color:#ddd;
-    font-size:14px;
-}
-
-.footer-links{
-    list-style:none;
-    padding:0;
-}
-
-.footer-links li{
-    margin-bottom:8px;
-}
-
-.footer-links a{
-    text-decoration:none;
-    color:#fff;
-    transition:0.3s;
-}
-
-.footer-links a:hover{
-    color:#ff4d4d;
-}
-
-.social-links a{
-    color:#fff;
-    font-size:20px;
-    margin-right:10px;
-    transition:0.3s;
-}
-
-.social-links a:hover{
-    color:#ff4d4d;
-}
-
-.newsletter-form {
-    text-align: center;
-}
+.social a:hover { background: var(--gold); color: #000; transform: translateY(-4px); }
 
 .newsletter-form input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin-bottom:12px;
-    border: 2px solid transparent;
-    outline: none;
-    font-size: 14px;
-    transition: 0.3s;
+    width: 100%; padding: 10px 14px; margin-bottom: 8px; border-radius: 10px;
+    background: var(--card2); color: #fff; border: 2px solid transparent; outline: none; font-family: inherit; font-size: 14px; transition: .2s;
 }
-
-.newsletter-form input:focus {
-    border: 2px solid orange;
-}
-
-.newsletter-form input.error-border {
-    border: 2px solid red;
-}
-
+.newsletter-form input:focus { border-color: var(--gold); }
 .newsletter-form button {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    background: orange;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.3s;
+    width: 100%; padding: 11px; border: none; border-radius: 10px; cursor: pointer;
+    background: var(--gold); color: #000; font-family: inherit; font-weight: 800; font-size: 14px; transition: .2s;
 }
+.newsletter-form button:hover { background: #fff; }
+.error { color: #f87171; font-size: 12px; margin: -4px 0 6px; min-height: 0; }
+.copy { text-align: center; margin-top: 34px; padding-top: 18px; border-top: 1px solid #222; font-size: 13px; color: var(--muted); }
 
-.newsletter-form button:hover {
-    background: darkorange;
-    transform: scale(1.05);
-}
+/* ---------- REVEAL ---------- */
+.reveal { opacity: 0; transform: translateY(40px); transition: .7s ease; }
+.reveal.show { opacity: 1; transform: none; }
 
-.newsletter-form button:active {
-    transform: scale(0.95);
+@media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; padding-top: 50px; }
+    .fgrid { grid-template-columns: 1fr 1fr; }
+    .float { display: none; }
 }
-
-.error {
-    color: red;
-    font-size: 13px;
-    margin-bottom: 5px;
-    text-align: left;
+@media (max-width: 560px) {
+    .two { grid-template-columns: 1fr; gap: 0; }
+    .fgrid { grid-template-columns: 1fr; }
+    .slip { padding: 26px 20px; }
+    .slip .cut { margin: 0 -20px 20px; }
+    .maplabel { position: static; max-width: none; border-radius: 0; }
+    .mapcard iframe { height: 300px; }
 }
-
-.footer hr{
-    border-color:#444;
-}
-    </style>
+</style>
 </head>
 <body>
 
-<nav class="nav-container">
-    <ul>
-        <li class="brand">
-            <img src="Assets/logo.png"> <a href="index.php">
-            B K's Burger House
-            </a>
-        </li>
-        <div>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="menu.php">Menu</a></li>
-            <li><a href="cart.php">Cart</a></li>
-            <li><a href="about.php">About</a></li>
-            <li class="profile">
-                    <img src="<?php echo $img; ?>" id="profileBtn">
-                    <div class="dropdown" id="dropMenu">
-                        <a href="account.php">Account</a><br>
-                        <a href="wishlist.php">Wishlist</a><br>
-                        <a href="logout.php">Logout</a>
-                    </div>
-            </li>
+<!-- ---------- NAV ---------- -->
+<nav class="nav">
+    <div class="wrap">
+        <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> B K’S <span>BURGER HOUSE</span></a>
+        <div class="links">
+            <a href="index.php">Home</a>
+            <a href="menu.php">Menu</a>
+            <a href="cart.php">Cart</a>
+            <a href="about.php">About</a>
+            <a href="contact.php" class="active">Contact</a>
+            <div class="profile">
+                <img src="<?= h($img) ?>" id="profileBtn" alt="Profile">
+                <div class="dropdown" id="dropMenu">
+                    <a href="account.php">Account</a>
+                    <a href="wishlist.php">Wishlist</a>
+                    <a href="logout.php">Logout</a>
+                </div>
+            </div>
         </div>
-    </ul>
+    </div>
 </nav>
 
-<div class="contact-title-box">
-    <h1>Contact Us</h1>
-</div>
-
-<section class="py-5">
-<div class="container">
-    <div class="row text-center mb-5">
-
-        <div class="col-md-4">
-        <div class="info-box" style="color: black;">
-            <div class="icon-circle">
-                <i class="bi bi-geo-alt"></i>
-            </div>
-            <h5>Store Location</h5>
-            <p>
-            <a href="https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.2394624,72.8443551,5186m/data=!3m1!1e3!4m10!1m2!2m1!1sajay's+burger!3m6!1s0x3be04f838741b843:0x436df813b3079b08!8m2!3d21.239469!4d72.8803962!15sCg1hamF5J3MgYnVyZ2VyWg8iDWFqYXkncyBidXJnZXKSARRmYXN0X2Zvb2RfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOUE1TMTZWa3AzRUFF4AEA-gEECAAQSg!16s%2Fg%2F11nc9gy0jb?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D" 
-            target="_blank" 
-            style="text-decoration:none;color:inherit;">
-            <p>Ajay's Burger House,Sudama Chowk,Mota Varachha, Surat ,Gujarat</p>
-            </a>
-            </p>
-        </div>
-        </div>
-
-        <div class="col-md-4">
-        <div class="info-box" style="color: black;">
-            <div class="icon-circle">
-                <i class="bi bi-clock"></i>
-            </div>
-            <h5>Opening Hours</h5>
-            <p>Mon - Fri : 10 AM - 10 PM</p>
-            <p>Sat - Sun : 11 AM - 12 AM</p>
-        </div>
-        </div>
-
-        <div class="col-md-4">
-        <div class="info-box" style="color: black;">
-            <div class="icon-circle">
-                <i class="bi bi-telephone"></i>
-            </div>
-            <h5>Contact</h5>
-            <p>
-            <a href="mailto:burgerhousebk28@gmail.com" style="text-decoration:none; color:black;">
-                burgerhousebk28@gmail.com
-            </a>
-            </p>
-            <p>
-            <a href="https://wa.me/919904522025" target="_blank" style="text-decoration:none; color:black;">
-                💬 +91 99045 22025
-            </a>
-            </p>
-        </div>
+<!-- ---------- HERO ---------- -->
+<header class="hero">
+    <span class="float f1">🍔</span>
+    <span class="float f2">🍟</span>
+    <span class="float f3">🥤</span>
+    <span class="float f4">🌶️</span>
+    <div class="wrap">
+        <p class="hi">We love to hear from you</p>
+        <h1>Say <span>hello</span></h1>
+        <p class="sub">Feedback, party orders or just a burger craving? Drop us a message and we will reply as fast as a fresh patty hits the grill.</p>
+        <div class="quick">
+            <a class="btn gold" href="https://wa.me/919904522025" target="_blank"><i class="bi bi-whatsapp"></i> WhatsApp us</a>
+            <a class="btn ghost" href="mailto:burgerhousebk28@gmail.com"><i class="bi bi-envelope-fill"></i> Email us</a>
         </div>
     </div>
-    <div class="col-lg-7 mx-auto">
-            <div class="contact-form-wrapper" style="color: black;">
-                <h3 class="mb-4">Send Message</h3>
+</header>
 
-                <?php if($success != "") { ?>
-                    <div class="alert alert-success">
-                        <?php echo $success; ?>
-                    </div>
-                <?php } ?>
+<div class="marquee"><div>
+    <?php for ($i = 0; $i < 12; $i++): ?>🍔 FRESH &amp; HOT &nbsp; ✦ &nbsp; WE REPLY WITHIN 24 HOURS &nbsp; ✦ &nbsp;<?php endfor; ?>
+</div></div>
 
-                <form action="" method="POST">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" name="name" placeholder="Your Name" required>
-                        </div>
+<!-- ---------- INFO + FORM ---------- -->
+<main class="wrap grid">
 
-                        <div class="col-md-6">
-                            <input type="email" class="form-control" name="email" placeholder="Your Email" required>
-                        </div>
-
-                        <div class="col-12">
-                            <input type="text" class="form-control" name="subject" placeholder="Subject" required>
-                        </div>
-
-                        <div class="col-12">
-                            <textarea class="form-control" name="message" rows="5" placeholder="Your Message" required></textarea>
-                        </div>
-
-                        <div class="col-12" style="color: black;">
-                            <button type="submit" name="send" class="btn btn-warning w-100">
-                                Send Message
-                            </button>
-                        </div>
-                    </div>
-                </form>
+    <section class="stack">
+        <div class="info reveal">
+            <div class="ico"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+                <h3>Store Location</h3>
+                <a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat</a>
             </div>
+        </div>
+
+        <div class="info reveal">
+            <div class="ico"><i class="bi bi-clock-fill"></i></div>
+            <div style="flex:1">
+                <h3>Opening Hours</h3>
+                <span class="status closed" id="openStatus"><i></i><b>Checking...</b></span>
+                <table class="hours">
+                    <tr data-days="1,2,3,4,5"><td>Mon - Fri</td><td>10 AM - 10 PM</td></tr>
+                    <tr data-days="0,6"><td>Sat - Sun</td><td>11 AM - 12 AM</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="info reveal">
+            <div class="ico"><i class="bi bi-telephone-fill"></i></div>
+            <div>
+                <h3>Contact</h3>
+                <p><a href="mailto:burgerhousebk28@gmail.com">burgerhousebk28@gmail.com</a></p>
+                <p><a href="https://wa.me/919904522025" target="_blank">💬 +91 99045 22025</a></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="slip reveal">
+        <span class="tag">MESSAGE SLIP</span>
+        <h2>Send us a message</h2>
+        <div class="cut"></div>
+
+        <?php if ($success !== ""): ?><div class="alert ok"><?= h($success) ?></div><?php endif; ?>
+        <?php if ($error !== ""): ?><div class="alert err"><?= h($error) ?></div><?php endif; ?>
+
+        <form action="" method="POST">
+            <div class="two">
+                <div class="field">
+                    <label for="c_name">Your name</label>
+                    <input type="text" id="c_name" name="name" required value="<?= h($_POST['name'] ?? '') ?>">
+                </div>
+                <div class="field">
+                    <label for="c_email">Your email</label>
+                    <input type="email" id="c_email" name="email" required value="<?= h($_POST['email'] ?? '') ?>">
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="c_subject">Subject</label>
+                <input type="text" id="c_subject" name="subject" required value="<?= h($_POST['subject'] ?? '') ?>">
+                <div class="chips">
+                    <button type="button" onclick="setSubject(this)">Feedback</button>
+                    <button type="button" onclick="setSubject(this)">Order issue</button>
+                    <button type="button" onclick="setSubject(this)">Party / Bulk order</button>
+                    <button type="button" onclick="setSubject(this)">Other</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="c_message">Message</label>
+                <textarea id="c_message" name="message" rows="4" required><?= h($_POST['message'] ?? '') ?></textarea>
+            </div>
+
+            <button type="submit" name="send" class="send">Send Message ✈</button>
+        </form>
+    </section>
+</main>
+
+<!-- ---------- MAP ---------- -->
+<section class="mapsec">
+    <div class="wrap">
+        <div class="mapcard reveal">
+            <iframe
+                src="https://www.google.com/maps?q=Mota+Varachha,Surat&z=13&output=embed"
+                allowfullscreen loading="lazy" title="Store map"></iframe>
+            <div class="maplabel">
+                <h4>Come hungry 🍔</h4>
+                <p>Sudama Chowk, Mota Varachha, Surat, Gujarat</p>
+                <a class="btn gold" href="<?= h($mapLink) ?>" target="_blank"><i class="bi bi-cursor-fill"></i> Get directions</a>
+            </div>
+        </div>
     </div>
-</div>
 </section>
 
-<div class="col-lg-3 col-md-4">
-    <div class="map-container">
-        <iframe 
-            src="https://www.google.com/maps?q=Mota+Varachha,Surat&z=13&output=embed"
-            width="400%" 
-            height="350" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy">
-        </iframe>
-    </div>
-</div>
-<br>
-<br>
-<footer class="footer py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-3">
-                <h3><i class="bi bi-shop"></i> B K's Burger House</h3>
+<!-- ---------- FOOTER ---------- -->
+<footer class="footer">
+    <div class="wrap">
+        <div class="fgrid">
+            <div>
+                <h3><i class="bi bi-shop"></i> B K’s Burger House</h3>
                 <p>Serving the best burgers in town since 2010.</p>
-                <div class="social-links">
+                <div class="social">
                     <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
                     <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
                     <a href="https://www.twitter.com"><i class="bi bi-twitter"></i></a>
                     <a href="https://www.youtube.com"><i class="bi bi-youtube"></i></a>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-4">
+
+            <div>
                 <h5>Quick Links</h5>
-                <ul class="footer-links">
+                <ul>
                     <li><a href="index.php">Home</a></li>
                     <li><a href="menu.php">Menu</a></li>
                     <li><a href="cart.php">Cart</a></li>
@@ -533,143 +450,119 @@ if(isset($_SESSION['username'])){
                     <li><a href="contact.php">Contact</a></li>
                 </ul>
             </div>
-            <div class="col-lg-3 col-md-4">
-                <h5>Location</h5>
-                <p>
-                    <a href="https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.2394624,72.8443551,5186m/data=!3m1!1e3!4m10!1m2!2m1!1sajay's+burger!3m6!1s0x3be04f838741b843:0x436df813b3079b08!8m2!3d21.239469!4d72.8803962!15sCg1hamF5J3MgYnVyZ2VyWg8iDWFqYXkncyBidXJnZXKSARRmYXN0X2Zvb2RfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOUE1TMTZWa3AzRUFF4AEA-gEECAAQSg!16s%2Fg%2F11nc9gy0jb?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D" 
-                    target="_blank" 
-                    style="text-decoration:none;color:inherit;">
-                    <p>Ajay's Burger House,Sudama Chowk,Mota Varachha, Surat ,Gujarat</p>
-                    </a>
-                </p>
-                <p>
-            <a href="mailto:burgerhousebk28@gmail.com" style="text-decoration:none; color:white;">
-                <i class="bi bi-envelope-fill"></i> burgerhousebk28@gmail.com
-            </a>
-            </p>
-            <p>
-            <a href="https://wa.me/919904522025" target="_blank" style="text-decoration:none; color:white;">
-                💬 +91 99045 22025
-            </a>
-            </p>
+
+            <div>
+                <h5>Find Us</h5>
+                <p><a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat</a></p>
+                <p><a href="mailto:burgerhousebk28@gmail.com"><i class="bi bi-envelope-fill"></i> burgerhousebk28@gmail.com</a></p>
+                <p><a href="https://wa.me/919904522025" target="_blank">💬 +91 99045 22025</a></p>
+                <p style="margin-top:8px">Mon - Fri: 10 AM - 10 PM<br>Sat - Sun: 11 AM - 12 AM</p>
             </div>
-            <div class="col-lg-2 col-md-4">
-                <h5>Opening Hours</h5>
-                <p>Mon - Fri: 10 AM - 10 PM</p>
-                <p>Sat - Sun: 11 AM - 12 AM</p>
-            </div>
-            <div class="col-lg-2">
-                <h5>NewSubscribe</h5>
+
+            <div>
+                <h5>Subscribe</h5>
                 <form class="newsletter-form" action="newsletter.php" method="POST" onsubmit="return validateEmail()">
-                    <input type="name" id="name" name="name" placeholder="Enter Name">
+                    <input type="text" id="name" name="name" placeholder="Enter Name">
                     <div id="nameError" class="error"></div>
                     <input type="email" id="email" name="email" placeholder="Your Email">
                     <div id="emailError" class="error"></div>
-                    <input type="city" id="city" name="city" placeholder="Enter City">
+                    <input type="text" id="city" name="city" placeholder="Enter City">
                     <div id="cityError" class="error"></div>
                     <button type="submit" onclick="goToSuccess()">Subscribe</button>
                 </form>
             </div>
         </div>
+        <p class="copy">© <?= date('Y') ?> B K’s Burger House. All rights reserved.</p>
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+/* Profile dropdown */
 document.addEventListener("DOMContentLoaded", function () {
     const btn = document.getElementById("profileBtn");
     const menu = document.getElementById("dropMenu");
-
-    if(btn){
-        btn.onclick = function(){
-            menu.style.display =
-                menu.style.display === "block" ? "none" : "block";
-        }
+    if (btn) {
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        });
+        document.addEventListener("click", function () { menu.style.display = "none"; });
     }
 });
 
-window.addEventListener("load", function() {
-    let title = document.querySelector(".contact-title-box");
-
-    if(title){
-        setTimeout(() => {
-            title.classList.add("show");
-        }, 200); 
-    }
-});
-
-window.addEventListener("scroll", function() {
-    let form = document.querySelector(".contact-form-wrapper");
-    let map = document.querySelector(".map-container");
-    let screenHeight = window.innerHeight;
-    if(form){
-        let formPos = form.getBoundingClientRect().top;
-        if(formPos < screenHeight - 100){
-            form.classList.add("show");
-        }
-    }
-    if(map){
-        let mapPos = map.getBoundingClientRect().top;
-        if(mapPos < screenHeight - 100){
-            map.classList.add("show");
-        }
-    }
-    let boxes = document.querySelectorAll(".info-box");
-    boxes.forEach((box, index) => {
-        let pos = box.getBoundingClientRect().top;
-
-        if(pos < screenHeight - 100){
-            setTimeout(() => {
-                box.classList.add("show");
-            }, index * 200); 
+/* Scroll reveal */
+const io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en, i) {
+        if (en.isIntersecting) {
+            setTimeout(function () { en.target.classList.add("show"); }, i * 120);
+            io.unobserve(en.target);
         }
     });
-});
+}, { threshold: 0.12 });
+document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
 
-function goToSuccess(){
+/* Subject quick chips */
+function setSubject(btn) {
+    document.getElementById("c_subject").value = btn.textContent;
+    document.querySelectorAll(".chips button").forEach(function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+}
+
+/* Open / Closed live status + today's row highlight */
+(function () {
+    const now = new Date();
+    const day = now.getDay();                       // 0 = Sun
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const weekend = (day === 0 || day === 6);
+    const openAt = (weekend ? 11 : 10) * 60;
+    const closeAt = weekend ? 24 * 60 : 22 * 60;
+    const isOpen = mins >= openAt && mins < closeAt;
+
+    const st = document.getElementById("openStatus");
+    st.className = "status " + (isOpen ? "open" : "closed");
+    st.querySelector("b").textContent = isOpen ? "Open now" : "Closed now";
+
+    document.querySelectorAll(".hours tr").forEach(function (tr) {
+        if (tr.dataset.days.split(",").indexOf(String(day)) !== -1) tr.classList.add("today");
+    });
+})();
+
+/* Newsletter */
+function goToSuccess() {
     sessionStorage.setItem("playSound", "true");
 }
 
 function validateEmail() {
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let city = document.getElementById("city").value;
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const city = document.getElementById("city").value;
 
-    let nameError = document.getElementById("nameError");
-    let emailError = document.getElementById("emailError");
-    let cityError = document.getElementById("cityError");
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const cityError = document.getElementById("cityError");
 
     let isValid = true;
-
     nameError.innerText = "";
     emailError.innerText = "";
     cityError.innerText = "";
 
     if (name.trim() === "") {
-        nameError.style.color = "red";
         nameError.innerText = "⚠ Please enter your Name!";
         isValid = false;
     }
 
     if (email.trim() === "") {
-        emailError.style.color = "red";
         emailError.innerText = "⚠ Please enter your Email!";
         isValid = false;
-    } else {
-        let pattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-        if (!email.match(pattern)) {
-            emailError.style.color = "red";
-            emailError.innerText = "⚠ Invalid email format!";
-            isValid = false;
-        }
+    } else if (!/^[^ ]+@[^ ]+\.[a-z]{2,3}$/.test(email)) {
+        emailError.innerText = "⚠ Invalid email format!";
+        isValid = false;
     }
 
     if (city.trim() === "") {
-        cityError.style.color = "red";
         cityError.innerText = "⚠ Please enter your City!";
         isValid = false;
     }
-
     return isValid;
 }
 </script>
