@@ -8,6 +8,20 @@ if (!isset($_SESSION['username'])) {
 }
 $username = $_SESSION['username'];
 
+// ---------- Profile image (header mate) ----------
+$img = "uploads/default.png";
+$stmt = mysqli_prepare($conn, "SELECT image FROM loginform WHERE username=?");
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $user_img);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+    if (!empty($user_img)) {
+        $img = "uploads/" . $user_img;
+    }
+}
+
 // ---------- DUKAN (RESTAURANT) NU REAL LOCATION ----------
 // Google Maps ma dukan par right-click karo -> pehla be number (lat, lng) copy karo
 $RESTAURANT = [
@@ -87,7 +101,7 @@ foreach ($orders as $o) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Orders</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   :root {
@@ -114,16 +128,33 @@ foreach ($orders as $o) {
   }
   .page { max-width: 1040px; margin: 0 auto; padding: 22px 20px 90px; }
 
-  /* ---------- TOP BAR + HERO ---------- */
-  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .brand { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1.5px; }
-  .brand span { color: var(--gold); }
-  .pill-link {
-    color: var(--gold); text-decoration: none; font-weight: 700; font-size: 14px;
-    border: 2px solid var(--gold); padding: 9px 20px; border-radius: 999px; transition: .2s;
+  /* ---------- NAV (index.php jevo header) ---------- */
+  .nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; }
+  .nav .wrap {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 45px; min-height: 64px; flex-wrap: wrap;
   }
-  .pill-link:hover { background: var(--gold); color: #000; }
+  .nav .brand {
+    display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0;
+  }
+  .nav .brand img { width: 38px; height: 38px; object-fit: contain; }
+  .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .links > a { text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 17px; transition: color .2s; }
+  .links > a:hover { color: #ff4d4d; }
+  .profile { position: relative; margin-left: 4px; }
+  .profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; display: block; }
+  .dropdown { display: none; position: absolute; right: 0; top: 52px; min-width: 150px; z-index: 2000; background: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  .dropdown a { display: block; padding: 11px 16px; text-decoration: none; color: #fff; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
+  .dropdown a:hover { background: var(--red2); }
+  @media (max-width: 700px) {
+    .nav .wrap { padding: 10px 16px; }
+    .links { gap: 16px; }
+    .links > a { font-size: 15px; }
+    .nav .brand { font-size: 18px; }
+  }
 
+  /* ---------- HERO ---------- */
   .hero { margin: 38px 0 28px; }
   .hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; }
   .hero h1 {
@@ -283,12 +314,28 @@ foreach ($orders as $o) {
 </style>
 </head>
 <body>
-<main class="page">
-  <div class="bar">
-    <div class="brand">🍔 B K’S <span>BURGER HOUSE</span></div>
-    <a class="pill-link" href="menu.php">← Back to menu</a>
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
+    <div class="links">
+      <a href="index.php">Home</a>
+      <a href="menu.php">Menu</a>
+      <a href="cart.php">Cart</a>
+      <a href="about.php">About</a>
+      <a href="contact.php">Contact</a>
+      <div class="profile">
+        <img src="<?= h($img) ?>" id="profileBtn" alt="Profile">
+        <div class="dropdown" id="dropMenu">
+          <a href="account.php">Account</a>
+          <a href="wishlist.php">Wishlist</a>
+          <a href="logout.php">Logout</a>
+        </div>
+      </div>
+    </div>
   </div>
+</nav>
 
+<main class="page">
   <section class="hero">
     <p class="hi">Hi, <?= h($username) ?> 👋</p>
     <h1>Your <span>orders</span></h1>
@@ -373,6 +420,19 @@ foreach ($orders as $o) {
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("profileBtn");
+    const menu = document.getElementById("dropMenu");
+    if (btn) {
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        });
+        document.addEventListener("click", function () { menu.style.display = "none"; });
+    }
+});
+</script>
 <script>
 const SHOP = {
     name: <?= json_encode($RESTAURANT['name']) ?>,

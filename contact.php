@@ -67,7 +67,7 @@ $mapLink = "https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.239
 <title>Contact Us - Burger House</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -98,32 +98,38 @@ body {
 a { color: inherit; }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-/* ---------- NAV ---------- */
+/* ---------- NAV (index.php jevo header) ---------- */
 .nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(0,0,0,.92); backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--line);
+    background: #0b0b0b;
+    font-family: 'Poppins', sans-serif;
 }
-.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1.5px; }
+.nav .wrap {
+    max-width: none;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 45px; min-height: 64px; flex-wrap: wrap;
+}
+.brand {
+    display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff;
+    font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0;
+}
 .brand img { width: 38px; height: 38px; object-fit: contain; }
-.brand span { color: var(--gold); }
-.links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .links > a {
-    text-decoration: none; font-weight: 600; font-size: 14px;
-    padding: 8px 14px; border-radius: 999px; transition: .2s;
+    text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif;
+    font-weight: 500; font-size: 17px; padding: 0; border-radius: 0; transition: color .2s;
 }
-.links > a:hover { background: var(--gold); color: #000; }
-.links > a.active { background: var(--red); }
-.profile { position: relative; margin-left: 8px; }
-.profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); cursor: pointer; display: block; }
-.dropdown {
-    display: none; position: absolute; right: 0; top: 52px; min-width: 150px;
-    background: var(--red); border-radius: 12px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,.5);
-}
-.dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; }
+.links > a:hover { background: none; color: #ff4d4d; }
+.profile { position: relative; margin-left: 4px; }
+.profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: none; cursor: pointer; display: block; }
+.dropdown { display: none; position: absolute; right: 0; top: 52px; min-width: 150px; background: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); z-index: 200; }
+.dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
 .dropdown a:hover { background: var(--red2); }
+@media (max-width: 700px) {
+    .nav .wrap { padding: 10px 16px; }
+    .links { gap: 16px; }
+    .links > a { font-size: 15px; }
+    .brand { font-size: 18px; }
+}
 
 /* ---------- HERO ---------- */
 .hero { position: relative; padding: 70px 0 54px; text-align: center; }
@@ -242,33 +248,46 @@ a { color: inherit; }
 .maplabel p { font-size: 13px; color: var(--muted); margin: 4px 0 12px; line-height: 1.5; }
 .maplabel .btn { padding: 9px 18px; font-size: 13px; }
 
-/* ---------- FOOTER ---------- */
-.footer { background: #000; border-top: 4px solid var(--red); padding: 54px 0 28px; }
-.fgrid { display: grid; grid-template-columns: 1.3fr .8fr 1.3fr 1.2fr; gap: 30px; }
-.footer h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: 1.5px; margin-bottom: 10px; }
-.footer h5 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 22px; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 12px; }
-.footer p, .footer li, .footer a { font-size: 14px; color: #cfc4b8; line-height: 1.7; text-decoration: none; }
-.footer ul { list-style: none; }
-.footer a:hover { color: var(--gold); }
-.social { display: flex; gap: 10px; margin-top: 14px; }
-.social a {
-    width: 40px; height: 40px; border-radius: 50%; background: var(--card2);
-    display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; transition: .2s;
+/* ---------- FOOTER (index.php jevo) ---------- */
+.site-footer {
+    background: #111; color: #fff; font-family: 'Poppins', sans-serif;
+    padding: 48px 45px 56px; margin-top: 0;
 }
-.social a:hover { background: var(--gold); color: #000; transform: translateY(-4px); }
-
-.newsletter-form input {
-    width: 100%; padding: 10px 14px; margin-bottom: 8px; border-radius: 10px;
-    background: var(--card2); color: #fff; border: 2px solid transparent; outline: none; font-family: inherit; font-size: 14px; transition: .2s;
+.ft-wrap {
+    display: grid; grid-template-columns: 1.3fr .9fr 1.45fr 1fr .95fr; gap: 34px;
+    max-width: 1500px; margin: 0 auto; align-items: start;
 }
-.newsletter-form input:focus { border-color: var(--gold); }
-.newsletter-form button {
-    width: 100%; padding: 11px; border: none; border-radius: 10px; cursor: pointer;
-    background: var(--gold); color: #000; font-family: inherit; font-weight: 800; font-size: 14px; transition: .2s;
+.site-footer h3 { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 500; letter-spacing: 0; margin-bottom: 14px; color: #fff; }
+.site-footer h5 { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 500; letter-spacing: 0; margin-bottom: 14px; color: #fff; }
+.site-footer p { font-size: 15px; font-weight: 500; line-height: 1.65; color: #fff; margin-bottom: 14px; }
+.site-footer a { color: #fff; text-decoration: none; font-weight: 500; transition: color .2s; }
+.site-footer a:hover { color: #ff4d4d; }
+.site-footer ul { list-style: none; }
+.site-footer li { margin-bottom: 8px; font-size: 17px; }
+.ft-social { display: flex; gap: 14px; margin-top: 18px; }
+.ft-social a { font-size: 22px; line-height: 1; }
+.ft-loc iframe { display: block; width: 100%; height: 150px; border: 0; border-radius: 4px; margin-bottom: 18px; }
+.ft-loc p { margin-bottom: 12px; }
+.ft-sub input {
+    display: block; width: 100%; height: 40px; padding: 8px 12px; margin-bottom: 14px;
+    background: #fff; color: #222; border: 2px solid transparent; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: 14px; outline: none; transition: .2s;
 }
-.newsletter-form button:hover { background: #fff; }
-.error { color: #f87171; font-size: 12px; margin: -4px 0 6px; min-height: 0; }
-.copy { text-align: center; margin-top: 34px; padding-top: 18px; border-top: 1px solid #222; font-size: 13px; color: var(--muted); }
+.ft-sub input:focus { border-color: orange; }
+.ft-sub button {
+    width: 100%; padding: 10px; border: none; border-radius: 10px; cursor: pointer;
+    background: orange; color: #fff; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 500; transition: .2s;
+}
+.ft-sub button:hover { background: darkorange; transform: scale(1.03); }
+.ft-sub button:active { transform: scale(.97); }
+.ft-sub .error { color: red; font-size: 13px; margin: -8px 0 8px; text-align: left; }
+@media (max-width: 1000px) {
+    .ft-wrap { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+    .site-footer { padding: 36px 20px 40px; }
+    .ft-wrap { grid-template-columns: 1fr; }
+}
 
 /* ---------- REVEAL ---------- */
 .reveal { opacity: 0; transform: translateY(40px); transition: .7s ease; }
@@ -294,13 +313,13 @@ a { color: inherit; }
 <!-- ---------- NAV ---------- -->
 <nav class="nav">
     <div class="wrap">
-        <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> B K’S <span>BURGER HOUSE</span></a>
+        <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
         <div class="links">
             <a href="index.php">Home</a>
             <a href="menu.php">Menu</a>
             <a href="cart.php">Cart</a>
             <a href="about.php">About</a>
-            <a href="contact.php" class="active">Contact</a>
+            <a href="contact.php">Contact</a>
             <div class="profile">
                 <img src="<?= h($img) ?>" id="profileBtn" alt="Profile">
                 <div class="dropdown" id="dropMenu">
@@ -426,53 +445,56 @@ a { color: inherit; }
 </section>
 
 <!-- ---------- FOOTER ---------- -->
-<footer class="footer">
-    <div class="wrap">
-        <div class="fgrid">
-            <div>
-                <h3><i class="bi bi-shop"></i> B K’s Burger House</h3>
-                <p>Serving the best burgers in town since 2010.</p>
-                <div class="social">
-                    <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
-                    <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
-                    <a href="https://www.twitter.com"><i class="bi bi-twitter"></i></a>
-                    <a href="https://www.youtube.com"><i class="bi bi-youtube"></i></a>
-                </div>
-            </div>
-
-            <div>
-                <h5>Quick Links</h5>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="menu.php">Menu</a></li>
-                    <li><a href="cart.php">Cart</a></li>
-                    <li><a href="about.php">About</a></li>
-                    <li><a href="contact.php">Contact</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h5>Find Us</h5>
-                <p><a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat</a></p>
-                <p><a href="mailto:burgerhousebk28@gmail.com"><i class="bi bi-envelope-fill"></i> burgerhousebk28@gmail.com</a></p>
-                <p><a href="https://wa.me/919904522025" target="_blank">💬 +91 99045 22025</a></p>
-                <p style="margin-top:8px">Mon - Fri: 10 AM - 10 PM<br>Sat - Sun: 11 AM - 12 AM</p>
-            </div>
-
-            <div>
-                <h5>Subscribe</h5>
-                <form class="newsletter-form" action="newsletter.php" method="POST" onsubmit="return validateEmail()">
-                    <input type="text" id="name" name="name" placeholder="Enter Name">
-                    <div id="nameError" class="error"></div>
-                    <input type="email" id="email" name="email" placeholder="Your Email">
-                    <div id="emailError" class="error"></div>
-                    <input type="text" id="city" name="city" placeholder="Enter City">
-                    <div id="cityError" class="error"></div>
-                    <button type="submit" onclick="goToSuccess()">Subscribe</button>
-                </form>
+<footer class="site-footer">
+    <div class="ft-wrap">
+        <div>
+            <h3><i class="bi bi-shop"></i> B K's Burger House</h3>
+            <p>Serving the best burgers in town since 2010.</p>
+            <div class="ft-social">
+                <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
+                <a href="https://www.twitter.com"><i class="bi bi-twitter"></i></a>
+                <a href="https://www.youtube.com"><i class="bi bi-youtube"></i></a>
             </div>
         </div>
-        <p class="copy">© <?= date('Y') ?> B K’s Burger House. All rights reserved.</p>
+
+        <div>
+            <h5>Quick Links</h5>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="menu.php">Menu</a></li>
+                <li><a href="cart.php">Cart</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="ft-loc">
+            <h5>Location</h5>
+            <iframe src="https://maps.google.com/maps?q=MotaVarachha,Surat&output=embed" allowfullscreen loading="lazy" title="Map"></iframe>
+            <p><a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House,Sudama Chowk,Mota Varachha, Surat ,Gujarat</a></p>
+            <p><a href="mailto:burgerhousebk28@gmail.com"><i class="bi bi-envelope-fill"></i> burgerhousebk28@gmail.com</a></p>
+            <p><a href="https://wa.me/919904522025" target="_blank">💬 +91 99045 22025</a></p>
+        </div>
+
+        <div>
+            <h5>Opening Hours</h5>
+            <p>Mon - Fri: 10 AM - 10 PM</p>
+            <p>Sat - Sun: 11 AM - 12 AM</p>
+        </div>
+
+        <div class="ft-sub">
+            <h5>NewSubscribe</h5>
+            <form action="newsletter.php" method="POST" onsubmit="return validateEmail()">
+                <input type="text" id="name" name="name" placeholder="Enter Name">
+                <div id="nameError" class="error"></div>
+                <input type="email" id="email" name="email" placeholder="Your Email">
+                <div id="emailError" class="error"></div>
+                <input type="text" id="city" name="city" placeholder="Enter City">
+                <div id="cityError" class="error"></div>
+                <button type="submit" onclick="goToSuccess()">Subscribe</button>
+            </form>
+        </div>
     </div>
 </footer>
 

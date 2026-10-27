@@ -20,8 +20,20 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #0f0d0c;
+            --card: #1a1613;
+            --card2: #241d18;
+            --ink: #fff7ec;
+            --muted: #a39384;
+            --red: #e63946;
+            --red2: #9d0208;
+            --gold: #ffb703;
+            --line: #2f2620;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,50 +41,65 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: #fff;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            color: var(--ink);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background:
+                radial-gradient(circle at 8% -5%, rgba(230,57,70,.28), transparent 38%),
+                radial-gradient(circle at 100% 50%, rgba(255,183,3,.12), transparent 40%),
+                var(--bg);
+            background-attachment: fixed;
         }
 
+        /* ---------- HEADER (index.php jevo) ---------- */
         .header {
-            background: #000;
-            padding: 15px 30px;
+            background: #0b0b0b;
+            font-family: 'Poppins', sans-serif;
+            padding: 12px 45px;
+            min-height: 64px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: white;
+            gap: 12px;
+            color: #fff;
             text-decoration: none;
+            font-family: 'Poppins', sans-serif;
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .brand img {
-            width: 40px;
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
         }
 
         .menu {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 28px;
+            flex-wrap: wrap;
         }
 
-        .menu a {
+        .menu > a {
             color: #fff;
-            font-weight: bold;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 17px;
             text-decoration: none;
-            transition: 0.3s;
+            transition: color .2s;
         }
 
-        .menu a:hover {
+        .menu > a:hover {
             color: #ff4d4d;
         }
 
@@ -87,189 +114,240 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 2px solid #fff;
+            object-fit: cover;
+            background: var(--card2);
         }
 
         .dropdown {
             display: none;
             position: absolute;
-            top: 50px;
+            top: 52px;
             right: 0;
-            background: #ff4d4d;
+            background: var(--red);
             min-width: 150px;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
             z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,.5);
         }
 
         .dropdown a {
             display: block;
-            padding: 10px 15px;
+            padding: 11px 16px;
             color: #fff;
             text-decoration: none;
-            transition: 0.2s;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
         }
 
         .dropdown a:hover {
-            background: #cc0000;
+            background: var(--red2);
         }
 
+        @media (max-width: 700px) {
+            .header { padding: 10px 16px; }
+            .menu { gap: 14px; }
+            .menu > a { font-size: 14px; }
+            .brand { font-size: 17px; }
+        }
+
+        /* ---------- MAIN ---------- */
         .main-container {
-            padding: 40px 20px;
-            text-align: center;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 44px 20px 70px;
             flex: 1;
         }
 
-        .main-container h1 {
-            font-size: 32px;
-            margin-bottom: 30px;
-            color: #ff6b6b;
+        .hero {
+            margin-bottom: 34px;
         }
 
+        .hi {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .main-container h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            font-size: clamp(54px, 10vw, 96px);
+            line-height: .9;
+            letter-spacing: 2px;
+            margin-top: 6px;
+            color: var(--ink);
+        }
+
+        .main-container h1 span {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--red);
+        }
+
+        /* ---------- CARDS ---------- */
         .cards {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+            gap: 22px;
         }
 
         .card {
-            background: #ff4d4d;
-            padding: 25px 20px;
-            border-radius: 15px;
-            color: black;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            padding: 24px 24px 22px;
+            color: var(--ink);
             text-decoration: none;
-            width: 220px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
+            overflow: hidden;
+            box-shadow: 0 14px 40px rgba(0,0,0,.45);
+            transition: .3s;
         }
 
-        .card img {
-            width: 40px;
-            margin-bottom: 10px;
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(160deg, var(--red), var(--red2));
+            opacity: .9;
+            transition: .3s;
         }
 
         .card:hover {
-            background-color: #e04343;
-            transform: scale(1.05);
+            transform: translateY(-8px);
+            border-color: var(--gold);
+        }
+
+        .card:hover::before {
+            transform: scale(1.25);
+        }
+
+        .card .ico {
+            position: relative;
+            z-index: 1;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: var(--card2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: inset 0 0 0 2px rgba(255,183,3,.4);
+        }
+
+        .card .ico img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
         }
 
         .card h2 {
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            font-size: 72px;
+            line-height: 1;
+            letter-spacing: 1px;
+            margin-top: 18px;
+            color: var(--gold);
         }
 
         .card p {
-            font-size: 18px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 4px;
         }
 
-        .footer {
+        .card .go {
+            position: absolute;
+            right: 22px;
+            bottom: 20px;
+            font-size: 22px;
+            color: var(--gold);
+            transition: .3s;
+        }
+
+        .card:hover .go {
+            transform: translateX(6px);
+        }
+
+        .card.wallet h2 {
+            font-size: 40px;
+            margin-top: 18px;
+            color: var(--ink);
+            line-height: 1.05;
+        }
+
+        /* ---------- FOOTER (index.php jevo) ---------- */
+        .site-footer {
             background: #111;
             color: #fff;
+            font-family: 'Poppins', sans-serif;
+            padding: 48px 45px 56px;
             margin-top: auto;
-            padding: 40px 20px;
         }
 
-        .footer h3,
-        .footer h5 {
-            color: #fff;
-            margin-bottom: 15px;
+        .ft-wrap {
+            display: grid;
+            grid-template-columns: 1.3fr .9fr 1.45fr 1fr .95fr;
+            gap: 34px;
+            max-width: 1500px;
+            margin: 0 auto;
+            align-items: start;
         }
 
-        .footer p {
-            color: #ddd;
-            font-size: 14px;
-            margin-bottom: 8px;
+        .site-footer h3 { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 500; margin-bottom: 14px; color: #fff; }
+        .site-footer h5 { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 500; margin-bottom: 14px; color: #fff; }
+        .site-footer p { font-size: 15px; font-weight: 500; line-height: 1.65; color: #fff; margin-bottom: 14px; }
+        .site-footer a { color: #fff; text-decoration: none; font-weight: 500; transition: color .2s; }
+        .site-footer a:hover { color: #ff4d4d; }
+        .site-footer ul { list-style: none; }
+        .site-footer li { margin-bottom: 8px; font-size: 17px; }
+
+        .ft-social { display: flex; gap: 14px; margin-top: 18px; }
+        .ft-social a { font-size: 22px; line-height: 1; }
+
+        .ft-loc iframe { display: block; width: 100%; height: 150px; border: 0; border-radius: 4px; margin-bottom: 18px; }
+        .ft-loc p { margin-bottom: 12px; }
+
+        .ft-sub input {
+            display: block; width: 100%; height: 40px; padding: 8px 12px; margin-bottom: 14px;
+            background: #fff; color: #222; border: 2px solid transparent; border-radius: 10px;
+            font-family: 'Poppins', sans-serif; font-size: 14px; outline: none; transition: .2s;
+        }
+        .ft-sub input:focus { border-color: orange; }
+        .ft-sub button {
+            width: 100%; padding: 10px; border: none; border-radius: 10px; cursor: pointer;
+            background: orange; color: #fff; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 500; transition: .2s;
+        }
+        .ft-sub button:hover { background: darkorange; transform: scale(1.03); }
+        .ft-sub button:active { transform: scale(.97); }
+        .ft-sub .error { color: red; font-size: 13px; margin: -8px 0 8px; text-align: left; }
+
+        @media (max-width: 1000px) {
+            .ft-wrap { grid-template-columns: 1fr 1fr; }
         }
 
-        .footer-links {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 8px;
-        }
-
-        .footer-links a {
-            color: #fff;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: #ff4d4d;
-        }
-
-        .social-links a {
-            color: #fff;
-            font-size: 20px;
-            margin-right: 10px;
-            transition: 0.3s;
-        }
-
-        .social-links a:hover {
-            color: #ff4d4d;
-        }
-
-        .map-link {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .newsletter-form {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .newsletter-form input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            border: 2px solid transparent;
-            outline: none;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .newsletter-form input:focus {
-            border: 2px solid orange;
-        }
-
-        .newsletter-form input.error-border {
-            border: 2px solid red;
-        }
-
-        .newsletter-form button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            background: orange;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .newsletter-form button:hover {
-            background: darkorange;
-            transform: scale(1.05);
-        }
-
-        .error {
-            color: red;
-            font-size: 13px;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-
-        @media (max-width: 768px) {
-            .cards {
-                flex-direction: column;
-                align-items: center;
-            }
+        @media (max-width: 560px) {
+            .site-footer { padding: 36px 20px 40px; }
+            .ft-wrap { grid-template-columns: 1fr; }
+            .card { min-height: 190px; }
+            .card h2 { font-size: 60px; }
         }
     </style>
 </head>
@@ -285,7 +363,7 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             <a href="sales.php">Sales</a>
             <a href="manage_menu.php">Manage Menu</a>
             <div class="profile">
-                <img src="uploads/bk.png" id="profileBtn" alt="Profile">
+                <img src="uploads/bk.png" id="profileBtn" alt="Profile" onerror="this.onerror=null;this.src='Assets/logo.png'">
                 <div class="dropdown" id="dropMenu">
                     <a href="account.php">Account</a>
                     <a href="wishlist.php">Wishlist</a>
@@ -296,97 +374,109 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
     </div>
 
     <div class="main-container">
-        <h1>Admin Dashboard</h1>
+        <div class="hero">
+            <p class="hi">Welcome back, admin</p>
+            <h1>Admin <span>dashboard</span></h1>
+        </div>
 
         <div class="cards">
             <a href="total_orders.php" class="card">
-                <h2><?php echo $total_orders; ?></h2>
-                <p>Total Orders</p>
+                <div class="ico">🧾</div>
+                <div>
+                    <h2><?php echo $total_orders; ?></h2>
+                    <p>Total Orders</p>
+                </div>
+                <span class="go">→</span>
             </a>
 
             <a href="total_users.php" class="card">
-                <h2><?php echo $total_users; ?></h2>
-                <p>Total Users</p>
+                <div class="ico">👥</div>
+                <div>
+                    <h2><?php echo $total_users; ?></h2>
+                    <p>Total Users</p>
+                </div>
+                <span class="go">→</span>
             </a>
 
             <a href="happy_customers.php" class="card">
-                <h2><?php echo $happy_customers; ?></h2>
-                <p>Happy Customers</p>
+                <div class="ico">😊</div>
+                <div>
+                    <h2><?php echo $happy_customers; ?></h2>
+                    <p>Happy Customers</p>
+                </div>
+                <span class="go">→</span>
             </a>
 
-            <a href="total_price.php" class="card">
-                <img src="Assets/wallet.png" alt="wallet">
-                <p>Total Earning Price</p>
+            <a href="total_price.php" class="card wallet">
+                <div class="ico"><img src="Assets/wallet.png" alt="wallet"></div>
+                <div>
+                    <h2>Total Earning Price</h2>
+                    <p>View earnings</p>
+                </div>
+                <span class="go">→</span>
             </a>
         </div>
     </div>
 
-    <footer class="footer py-5">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-3">
-                    <h3><i class="bi bi-shop"></i> B K's Burger House</h3>
-                    <p>Serving the best burgers in town since 2010.</p>
-                    <div class="social-links">
-                        <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
-                        <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
-                        <a href="https://www.twitter.com"><i class="bi bi-twitter"></i></a>
-                        <a href="https://www.youtube.com"><i class="bi bi-youtube"></i></a>
-                    </div>
+    <footer class="site-footer">
+        <div class="ft-wrap">
+            <div>
+                <h3><i class="bi bi-shop"></i> B K's Burger House</h3>
+                <p>Serving the best burgers in town since 2010.</p>
+                <div class="ft-social">
+                    <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
+                    <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
+                    <a href="https://www.twitter.com"><i class="bi bi-twitter"></i></a>
+                    <a href="https://www.youtube.com"><i class="bi bi-youtube"></i></a>
                 </div>
+            </div>
 
-                <div class="col-lg-2 col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="footer-links">
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="menu.php">Menu</a></li>
-                        <li><a href="cart.php">Cart</a></li>
-                        <li><a href="about.php">About</a></li>
-                        <li><a href="contact.php">Contact</a></li>
-                    </ul>
-                </div>
+            <div>
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="menu.php">Menu</a></li>
+                    <li><a href="cart.php">Cart</a></li>
+                    <li><a href="about.php">About</a></li>
+                    <li><a href="contact.php">Contact</a></li>
+                </ul>
+            </div>
 
-                <div class="col-lg-3 col-md-4">
-                    <h5>Location</h5>
-                    <div class="map-container">
-                        <iframe
-                            src="https://maps.google.com/maps?q=MotaVarachha,Surat&output=embed"
-                            width="100%"
-                            height="150"
-                            style="border:0;"
-                            allowfullscreen=""
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                    <p>
-                        <a href="https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.2394624,72.8443551,5186m/data=!3m1!1e3!4m10!1m2!2m1!1sajay's+burger!3m6!1s0x3be04f838741b843:0x436df813b3079b08!8m2!3d21.239469!4d72.8803962!15sCg1hamF5J3MgYnVyZ2VyWg8iDWFqYXkncyBidXJnZXKSARRmYXN0X2Zvb2RfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOUE1TMTZWa3AzRUFF4AEA-gEECAAQSg!16s%2Fg%2F11nc9gy0jb?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D"
-                           target="_blank"
-                           class="map-link">
-                            Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat
-                        </a>
-                    </p>
-                    <p><i class="bi bi-telephone"></i> +91 9904522025</p>
-                    <p><i class="bi bi-envelope"></i> bk@burgerhouse.com</p>
-                </div>
+            <div class="ft-loc">
+                <h5>Location</h5>
+                <iframe
+                    src="https://maps.google.com/maps?q=MotaVarachha,Surat&output=embed"
+                    allowfullscreen=""
+                    loading="lazy"
+                    title="Map">
+                </iframe>
+                <p>
+                    <a href="https://www.google.com/maps/place/Ajay's+Sudama+Chowk,+Surat/@21.2394624,72.8443551,5186m/data=!3m1!1e3!4m10!1m2!2m1!1sajay's+burger!3m6!1s0x3be04f838741b843:0x436df813b3079b08!8m2!3d21.239469!4d72.8803962!15sCg1hamF5J3MgYnVyZ2VyWg8iDWFqYXkncyBidXJnZXKSARRmYXN0X2Zvb2RfcmVzdGF1cmFudJoBI0NoWkRTVWhOTUc5blMwVkpRMEZuU1VOUE1TMTZWa3AzRUFF4AEA-gEECAAQSg!16s%2Fg%2F11nc9gy0jb?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D"
+                       target="_blank">
+                        Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat
+                    </a>
+                </p>
+                <p><i class="bi bi-telephone"></i> +91 9904522025</p>
+                <p><i class="bi bi-envelope"></i> bk@burgerhouse.com</p>
+            </div>
 
-                <div class="col-lg-2 col-md-4">
-                    <h5>Opening Hours</h5>
-                    <p>Mon - Fri: 10 AM - 10 PM</p>
-                    <p>Sat - Sun: 11 AM - 12 AM</p>
-                </div>
+            <div>
+                <h5>Opening Hours</h5>
+                <p>Mon - Fri: 10 AM - 10 PM</p>
+                <p>Sat - Sun: 11 AM - 12 AM</p>
+            </div>
 
-                <div class="col-lg-2">
-                    <h5>NewSubscribe</h5>
-                    <form class="newsletter-form" action="newsletter.php" method="POST" onsubmit="return validateEmail()">
-                        <input type="text" id="name" name="name" placeholder="Enter Name">
-                        <div id="nameError" class="error"></div>
-                        <input type="email" id="email" name="email" placeholder="Your Email">
-                        <div id="emailError" class="error"></div>
-                        <input type="text" id="city" name="city" placeholder="Enter City">
-                        <div id="cityError" class="error"></div>
-                        <button type="submit" onclick="goToSuccess()">Subscribe</button>
-                    </form>
-                </div>
+            <div class="ft-sub">
+                <h5>NewSubscribe</h5>
+                <form action="newsletter.php" method="POST" onsubmit="return validateEmail()">
+                    <input type="text" id="name" name="name" placeholder="Enter Name">
+                    <div id="nameError" class="error"></div>
+                    <input type="email" id="email" name="email" placeholder="Your Email">
+                    <div id="emailError" class="error"></div>
+                    <input type="text" id="city" name="city" placeholder="Enter City">
+                    <div id="cityError" class="error"></div>
+                    <button type="submit" onclick="goToSuccess()">Subscribe</button>
+                </form>
             </div>
         </div>
     </footer>
