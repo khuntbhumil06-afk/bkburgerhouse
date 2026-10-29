@@ -91,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 }
 
 mysqli_close($conn);
+
+function e($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <!DOCTYPE html>
@@ -100,125 +104,396 @@ mysqli_close($conn);
     <title>Burger Mania - Login</title>
     <link rel="icon" href="Assets/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
+        :root {
+            --bg: #0f0d0c;
+            --card: #1a1613;
+            --ink: #fff7ec;
+            --red: #e63946;
+            --red2: #9d0208;
+            --gold: #ffb703;
+            --paper: #fff3d6;
+            --paper-ink: #2b2118;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: url('Assets/bg.png');
-            background-size: 130%;
-            animation: gradientBG 10s ease infinite;
+            padding: 0;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background:
+                linear-gradient(rgba(15,13,12,.88), rgba(15,13,12,.92)),
+                url('Assets/bg.png') center / cover fixed,
+                var(--bg);
         }
 
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 8% -5%, rgba(230,57,70,.30), transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(255,183,3,.16), transparent 40%);
+        }
+
+        /* ---------- TOP BRAND ---------- */
+        .top {
+            position: relative;
+            z-index: 2;
+            padding: 18px 45px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+        }
+
+        /* ---------- LOGIN CARD ---------- */
         .container {
+            position: relative;
+            z-index: 2;
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            padding: 20px 20px 50px;
         }
 
         .login-box {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            padding: 40px;
-            border-radius: 15px;
-            width: 350px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.8s ease;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            max-width: 900px;
+            min-height: 520px;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,.65);
+            animation: fadeIn .8s ease;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* left: promo */
+        .promo {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 44px 40px;
+            background: linear-gradient(160deg, var(--red), var(--red2));
+            overflow: hidden;
+        }
+
+        .promo::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: -1px;
+            width: 14px;
+            background: radial-gradient(circle at 14px 10px, var(--paper) 7px, transparent 7.5px) 0 0 / 14px 20px repeat-y;
+        }
+
+        .promo .hi {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        .promo h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            font-size: clamp(60px, 9vw, 92px);
+            line-height: .92;
+            letter-spacing: 2px;
+            margin: 8px 0 16px;
+        }
+
+        .promo h1 span {
+            color: transparent;
+            -webkit-text-stroke: 2px #fff;
+        }
+
+        .promo p {
+            max-width: 300px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(255,255,255,.88);
+        }
+
+        .float {
+            position: absolute;
+            font-size: 44px;
+            animation: floaty 5s ease-in-out infinite;
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,.4));
+        }
+
+        .float.f1 { right: 26px; top: 26px; }
+        .float.f2 { right: 40px; bottom: 90px; animation-delay: 1.3s; font-size: 36px; }
+        .float.f3 { left: 30px; bottom: 26px; animation-delay: 2.2s; font-size: 40px; }
+
+        @keyframes floaty {
+            0%, 100% { transform: translateY(0) rotate(-6deg); }
+            50%      { transform: translateY(-14px) rotate(6deg); }
+        }
+
+        /* right: form */
+        .formside {
+            background: var(--paper);
+            color: var(--paper-ink);
+            padding: 44px 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--red);
         }
 
         h2 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            font-size: 52px;
+            letter-spacing: 2px;
+            line-height: 1;
+            margin: 4px 0 22px;
+            color: var(--paper-ink);
+            text-align: left;
+        }
+
+        .field {
+            margin-bottom: 18px;
         }
 
         label {
-            color: #fff;
-            font-weight: bold;
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #7a6a4f;
+            margin-bottom: 4px;
+        }
+
+        .input-wrap {
+            position: relative;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 8px;
+            padding: 10px 2px;
+            margin: 0;
+            background: transparent;
             border: none;
+            border-bottom: 2px solid #c9b88f;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--paper-ink);
             outline: none;
+            transition: .2s;
         }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #fd0404;
-            color: #080808;
+        input:focus {
+            border-bottom-color: var(--red);
+        }
+
+        .input-wrap input[type="password"],
+        .input-wrap input.shown {
+            padding-right: 44px;
+        }
+
+        .eye {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto;
+            padding: 6px 8px;
+            background: none;
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            font-size: 18px;
             cursor: pointer;
-            transition: 0.3s;
+            box-shadow: none;
         }
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        .eye:hover {
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: none;
         }
 
         .error {
-            color: yellow;
-            font-size: 14px;
             display: block;
-            margin-bottom: 5px;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #b91c1c;
+        }
+
+        .error:empty {
+            display: none;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            margin-top: 6px;
+            padding: 15px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 0 var(--red2);
+            transition: .15s;
+        }
+
+        button[type="submit"]:hover {
+            background: #f1485a;
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 var(--red2);
         }
 
         .register-link {
             text-align: center;
-            margin-top: 15px;
-            color: #fff;
+            margin-top: 22px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7a6a4f;
         }
 
         .register-link a {
-            color: yellow;
-            font-weight: bold;
+            color: var(--red);
+            font-weight: 800;
             text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* ---------- MOBILE ---------- */
+        @media (max-width: 760px) {
+            .top { padding: 14px 18px; }
+            .login-box {
+                grid-template-columns: 1fr;
+                min-height: 0;
+                max-width: 440px;
+            }
+            .promo { padding: 28px 26px 30px; }
+            .promo::after { display: none; }
+            .promo h1 { font-size: 56px; margin-bottom: 8px; }
+            .promo p { display: none; }
+            .float.f2, .float.f3 { display: none; }
+            .formside { padding: 30px 26px 34px; }
+            h2 { font-size: 44px; }
         }
     </style>
 </head>
 
 <body>
+    <div class="top">
+        <a href="index.php" class="brand">
+            <img src="Assets/logo.png" alt="logo">
+            <span>B K's Burger House</span>
+        </a>
+    </div>
+
     <div class="container">
         <div class="login-box">
-            <h2>Login</h2>
 
-            <form method="post" autocomplete="off">
-                <label>Username</label>
-                <span class="error"><?php echo $uerr ?? ''; ?></span>
-                <input type="text" name="username" required>
+            <div class="promo">
+                <span class="float f1">🍔</span>
+                <span class="float f2">🍟</span>
+                <span class="float f3">🥤</span>
+                <span class="hi">Burger House</span>
+                <h1>Welcome <span>back</span></h1>
+                <p>Login to order your favourite burgers, track your orders and save your wishlist.</p>
+            </div>
 
-                <label>Password</label>
-                <span class="error"><?php echo $perr ?? ''; ?></span>
-                <input type="password" name="password" required>
+            <div class="formside">
+                <span class="tag">MEMBER LOGIN</span>
+                <h2>Login</h2>
 
-                <button type="submit">Login</button>
+                <form method="post" autocomplete="off">
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required value="<?php echo e($username); ?>">
+                        <span class="error"><?php echo e($uerr ?? ''); ?></span>
+                    </div>
 
-                <div class="register-link">
-                    Don't have an account?
-                    <a href="register.php">Register First</a>
-                </div>
-            </form>
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="eye" id="eye" aria-label="Show password">👁️</button>
+                        </div>
+                        <span class="error"><?php echo e($perr ?? ''); ?></span>
+                    </div>
+
+                    <button type="submit">Login</button>
+
+                    <div class="register-link">
+                        Don't have an account?
+                        <a href="register.php">Register First</a>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
+
+    <script>
+        // Password show / hide
+        (function () {
+            const pw = document.getElementById("password");
+            const eye = document.getElementById("eye");
+            eye.addEventListener("click", function () {
+                const show = pw.type === "password";
+                pw.type = show ? "text" : "password";
+                pw.classList.toggle("shown", show);
+                eye.textContent = show ? "🙈" : "👁️";
+                eye.setAttribute("aria-label", show ? "Hide password" : "Show password");
+            });
+        })();
+    </script>
 </body>
 </html>
