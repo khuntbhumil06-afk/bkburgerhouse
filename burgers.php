@@ -1,5 +1,14 @@
 <?php
+session_start();
 include 'config.php';
+
+// Admin check — Dashboard / Sales / Manage Menu માટે
+$isAdmin = isset($_SESSION['username']) && (($_SESSION['admin'] ?? 'NO') === 'YES');
+
+// Admin pages માટે link: admin હોય તો page, નહીંતર login
+function adminLink($page, $isAdmin) {
+    return $isAdmin ? $page : 'login.php';
+}
 
 $sql = "SELECT name, price FROM products";
 $result = mysqli_query($conn, $sql);
@@ -29,12 +38,10 @@ function getCategory($name, $categories){
     return "Drink"; 
 }
 
-// ---------- Design mate helpers ----------
 function e($value){
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-// "AlooTikkiBurger" -> "Aloo Tikki Burger", "BBQChickenBurger" -> "BBQ Chicken Burger"
 function prettyName($name){
     $name = preg_replace('/([a-z])([A-Z])/', '$1 $2', $name);
     $name = preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1 $2', $name);
@@ -52,7 +59,6 @@ $catMeta = [
     "Drink"          => ["emoji" => "🥤", "class" => "drink"],
 ];
 
-// Category pramane items vahenchi lo
 $grouped = array_fill_keys(array_keys($catMeta), []);
 foreach($allItems as $row){
     $grouped[getCategory($row['name'], $categories)][] = $row;
@@ -429,7 +435,6 @@ foreach($allItems as $row){
 
         /* ==================== RESPONSIVE ==================== */
 
-        /* Tablets */
         @media (max-width: 900px) {
             .header { padding: 12px 28px; }
             .wrap { padding: 0 18px 70px; }
@@ -440,7 +445,6 @@ foreach($allItems as $row){
             .sec-head h2 { font-size: 38px; }
         }
 
-        /* Mobile landscape / large phones */
         @media (max-width: 768px) {
             .header {
                 padding: 10px 18px;
@@ -543,7 +547,6 @@ foreach($allItems as $row){
             .item .pr { font-size: 22px; }
         }
 
-        /* Small phones */
         @media (max-width: 480px) {
             .brand { font-size: 16px; gap: 8px; }
             .brand img { width: 32px; height: 32px; }
@@ -585,7 +588,7 @@ foreach($allItems as $row){
             }
 
             .sec-head::after {
-                display: none; /* hide dashed line on very small screens */
+                display: none;
             }
 
             .board {
@@ -624,7 +627,6 @@ foreach($allItems as $row){
             }
         }
 
-        /* Extra small */
         @media (max-width: 360px) {
             .sec-head h2 { font-size: 22px; }
             .item .nm { font-size: 12px; }
@@ -648,9 +650,9 @@ foreach($allItems as $row){
 
     <div class="menu" id="navMenu">
         <a href="index.php">Home</a>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="sales.php">Sales</a>
-        <a href="manage_menu.php">Manage Menu</a>
+        <a href="<?= e(adminLink('dashboard.php', $isAdmin)) ?>">Dashboard</a>
+        <a href="<?= e(adminLink('sales.php', $isAdmin)) ?>">Sales</a>
+        <a href="<?= e(adminLink('manage_menu.php', $isAdmin)) ?>">Manage Menu</a>
     </div>
 </div>
 
@@ -739,7 +741,6 @@ foreach($allItems as $row){
                 if (ok) visible++;
             });
 
-            // Search chalu hoy to khali category chhupavo
             const hasItems = sec.querySelectorAll(".item").length > 0;
             const hide = !catOk || (q !== "" && visible === 0) || (!hasItems && q !== "");
             sec.style.display = hide ? "none" : "";

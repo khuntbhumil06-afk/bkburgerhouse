@@ -1,5 +1,14 @@
 <?php
+session_start();
 include 'config.php';
+
+// Admin check — Dashboard / Sales / Manage Menu માટે
+$isAdmin = isset($_SESSION['username']) && (($_SESSION['admin'] ?? 'NO') === 'YES');
+
+// Admin pages માટે link: admin હોય તો page, નહીંતર login
+function adminLink($page, $isAdmin) {
+    return $isAdmin ? $page : 'login.php';
+}
 
 $sql = "SELECT COUNT(*) as total_orders FROM orders";
 $result = mysqli_query($conn, $sql);
@@ -281,14 +290,12 @@ $total_orders = mysqli_fetch_assoc($result)['total_orders'] ?? 0;
 
         /* ==================== RESPONSIVE ==================== */
 
-        /* Tablets */
         @media (max-width: 900px) {
             .header { padding: 12px 28px; }
             .wrap { padding: 0 18px 70px; }
             .hero { padding: 40px 0 28px; }
         }
 
-        /* Mobile landscape / large phones */
         @media (max-width: 768px) {
             .header {
                 padding: 10px 18px;
@@ -362,7 +369,6 @@ $total_orders = mysqli_fetch_assoc($result)['total_orders'] ?? 0;
             .btn-row { margin-top: 32px; }
         }
 
-        /* Small phones */
         @media (max-width: 480px) {
             .brand { font-size: 16px; gap: 8px; }
             .brand img { width: 32px; height: 32px; }
@@ -428,7 +434,6 @@ $total_orders = mysqli_fetch_assoc($result)['total_orders'] ?? 0;
             }
         }
 
-        /* Extra small */
         @media (max-width: 360px) {
             .card h3 {
                 font-size: 48px;
@@ -452,9 +457,9 @@ $total_orders = mysqli_fetch_assoc($result)['total_orders'] ?? 0;
 
     <div class="menu" id="navMenu">
         <a href="index.php">Home</a>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="sales.php">Sales</a>
-        <a href="manage_menu.php">Manage Menu</a>
+        <a href="<?= htmlspecialchars(adminLink('dashboard.php', $isAdmin)) ?>">Dashboard</a>
+        <a href="<?= htmlspecialchars(adminLink('sales.php', $isAdmin)) ?>">Sales</a>
+        <a href="<?= htmlspecialchars(adminLink('manage_menu.php', $isAdmin)) ?>">Manage Menu</a>
     </div>
 </div>
 
