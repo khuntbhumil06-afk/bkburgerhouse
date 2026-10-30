@@ -281,6 +281,7 @@ body::before {
     font-size: 44px;
     animation: floaty 5s ease-in-out infinite;
     filter: drop-shadow(0 8px 10px rgba(0,0,0,.4));
+    pointer-events: none;
 }
 
 .float.f1 { right: 26px; top: 24px; }
@@ -496,17 +497,155 @@ input[type="file"]::file-selector-button:hover {
     margin-top: 10px;
 }
 
-/* ---------- MOBILE ---------- */
+/* ==================== RESPONSIVE ==================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+    .top { padding: 16px 28px; }
+    .wrap { padding: 10px 16px 40px; }
+    .box {
+        grid-template-columns: .95fr 1.05fr;
+        max-width: 820px;
+    }
+    .promo { padding: 36px 30px; }
+    .formside { padding: 32px 30px 30px; }
+    h2 { font-size: 44px; }
+}
+
+/* Mobile landscape / large phones */
 @media (max-width: 800px) {
     .top { padding: 14px 18px; }
-    .box { grid-template-columns: 1fr; max-width: 460px; }
-    .promo { padding: 26px 26px 28px; }
+    .brand { font-size: 18px; gap: 10px; }
+    .brand img { width: 34px; height: 34px; }
+
+    .wrap { padding: 8px 16px 36px; }
+
+    .box {
+        grid-template-columns: 1fr;
+        max-width: 460px;
+        border-radius: 22px;
+    }
+
+    .promo {
+        padding: 28px 26px 26px;
+        text-align: center;
+        align-items: center;
+    }
     .promo::after { display: none; }
-    .promo h1 { font-size: 54px; margin-bottom: 6px; }
-    .promo p, .perks { display: none; }
+    .promo .hi { letter-spacing: 3px; }
+    .promo h1 {
+        font-size: 52px;
+        margin: 6px 0 10px;
+    }
+    .promo p {
+        max-width: 100%;
+        margin-bottom: 14px;
+        font-size: 13px;
+    }
+    .perks {
+        display: none; /* hide detailed perks on mobile to save space */
+    }
+    .float.f1 { right: 18px; top: 16px; font-size: 36px; }
     .float.f2 { display: none; }
-    .formside { padding: 28px 24px 30px; }
-    h2 { font-size: 42px; }
+
+    .formside {
+        padding: 28px 24px 30px;
+    }
+    h2 {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+    .field { margin-bottom: 14px; }
+    .form-control { font-size: 15px; padding: 10px 2px; }
+
+    .photo-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .avatar {
+        width: 76px;
+        height: 76px;
+        font-size: 28px;
+    }
+    input[type="file"] {
+        width: 100%;
+    }
+    input[type="file"]::file-selector-button {
+        padding: 10px 16px;
+        margin-right: 10px;
+    }
+
+    .btn-register {
+        padding: 14px;
+        font-size: 15px;
+        margin-top: 16px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .top { padding: 12px 16px; }
+    .brand { font-size: 16px; gap: 8px; }
+    .brand img { width: 30px; height: 30px; }
+
+    .wrap { padding: 6px 14px 30px; }
+
+    .box {
+        border-radius: 18px;
+        max-width: 100%;
+    }
+
+    .promo {
+        padding: 22px 20px 20px;
+    }
+    .promo h1 {
+        font-size: 44px;
+        letter-spacing: 1px;
+    }
+    .promo p { font-size: 13px; }
+    .float.f1 { font-size: 30px; right: 14px; top: 12px; }
+
+    .formside {
+        padding: 24px 18px 26px;
+    }
+    .tag { font-size: 10px; letter-spacing: 2.5px; }
+    h2 {
+        font-size: 36px;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+
+    label { font-size: 10px; }
+    .form-control { font-size: 14px; }
+    .error { font-size: 12px; }
+
+    .avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 26px;
+    }
+
+    .btn-register {
+        padding: 13px;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    .login-link { font-size: 13px; margin-top: 16px; }
+}
+
+/* Extra small phones */
+@media (max-width: 360px) {
+    .promo h1 { font-size: 38px; }
+    h2 { font-size: 32px; }
+    .formside { padding: 20px 16px 22px; }
+    .photo-row { gap: 10px; }
+    .avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+    }
 }
 </style>
 <script>

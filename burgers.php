@@ -94,9 +94,10 @@ foreach($allItems as $row){
                 radial-gradient(circle at 100% 60%, rgba(255,183,3,.12), transparent 40%),
                 var(--bg);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* ---------- HEADER (index.php jevo) ---------- */
+        /* ---------- HEADER ---------- */
         .header {
             background: #0b0b0b;
             font-family: 'Poppins', sans-serif;
@@ -106,7 +107,9 @@ foreach($allItems as $row){
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
@@ -117,6 +120,7 @@ foreach($allItems as $row){
             text-decoration: none;
             font-size: 20px;
             font-weight: 700;
+            z-index: 1001;
         }
 
         .brand img {
@@ -129,7 +133,6 @@ foreach($allItems as $row){
             display: flex;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
         }
 
         .menu a {
@@ -144,11 +147,33 @@ foreach($allItems as $row){
             color: #ff4d4d;
         }
 
-        @media (max-width: 700px) {
-            .header { padding: 10px 16px; }
-            .menu { gap: 14px; }
-            .menu a { font-size: 14px; }
-            .brand { font-size: 17px; }
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* ---------- PAGE ---------- */
@@ -271,6 +296,7 @@ foreach($allItems as $row){
             justify-content: center;
             font-size: 24px;
             box-shadow: inset 0 0 0 2px rgba(255,183,3,.4);
+            flex-shrink: 0;
         }
 
         .sec-head h2 {
@@ -288,6 +314,7 @@ foreach($allItems as $row){
             font-size: 13px;
             padding: 4px 14px;
             border-radius: 999px;
+            flex-shrink: 0;
         }
 
         .sec-head::after {
@@ -400,9 +427,208 @@ foreach($allItems as $row){
             box-shadow: 0 1px 0 var(--red2);
         }
 
-        @media (max-width: 760px) {
-            .board { grid-template-columns: 1fr; padding: 8px 18px; }
-            .sec-head h2 { font-size: 34px; }
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablets */
+        @media (max-width: 900px) {
+            .header { padding: 12px 28px; }
+            .wrap { padding: 0 18px 70px; }
+            .board {
+                column-gap: 28px;
+                padding: 10px 20px;
+            }
+            .sec-head h2 { font-size: 38px; }
+        }
+
+        /* Mobile landscape / large phones */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 18px;
+            }
+
+            .hamburger { display: flex; }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 90px 30px 40px;
+                gap: 8px;
+                transition: right .35s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,.5);
+                z-index: 999;
+            }
+
+            .menu.open { right: 0; }
+
+            .menu a {
+                font-size: 18px;
+                padding: 12px 0;
+                width: 100%;
+                border-bottom: 1px solid #222;
+            }
+
+            .hero {
+                padding: 36px 0 22px;
+            }
+
+            .hero h1 {
+                font-size: clamp(48px, 14vw, 72px);
+            }
+
+            .tools {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .search {
+                max-width: 100%;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .filters {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .filters button {
+                flex-shrink: 0;
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+
+            .section { margin-top: 28px; }
+
+            .sec-head {
+                gap: 10px;
+            }
+
+            .sec-head .ico {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+
+            .sec-head h2 {
+                font-size: 32px;
+                letter-spacing: 1px;
+            }
+
+            .sec-head .count {
+                font-size: 12px;
+                padding: 3px 11px;
+            }
+
+            .board {
+                grid-template-columns: 1fr;
+                padding: 8px 16px;
+                border-radius: 18px;
+            }
+
+            .item {
+                padding: 12px 0;
+            }
+
+            .item .nm { font-size: 14px; }
+            .item .pr { font-size: 22px; }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .brand { font-size: 16px; gap: 8px; }
+            .brand img { width: 32px; height: 32px; }
+
+            .hero {
+                padding: 28px 0 18px;
+            }
+
+            .hi {
+                font-size: 11px;
+                letter-spacing: 2.5px;
+            }
+
+            .hero h1 {
+                font-size: clamp(42px, 16vw, 58px);
+                letter-spacing: 1px;
+            }
+
+            .search {
+                padding: 11px 16px;
+                font-size: 13px;
+            }
+
+            .filters button {
+                font-size: 11px;
+                padding: 7px 12px;
+            }
+
+            .section { margin-top: 24px; }
+
+            .sec-head .ico {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .sec-head h2 {
+                font-size: 26px;
+            }
+
+            .sec-head::after {
+                display: none; /* hide dashed line on very small screens */
+            }
+
+            .board {
+                padding: 6px 14px;
+                border-radius: 16px;
+            }
+
+            .item {
+                padding: 11px 0;
+                gap: 8px;
+            }
+
+            .item .nm { font-size: 13px; }
+            .item .pr { font-size: 20px; }
+
+            .veg .nm::before,
+            .nonveg .nm::before {
+                width: 9px;
+                height: 9px;
+                margin-right: 8px;
+            }
+
+            .no-result {
+                padding: 32px 16px;
+                border-radius: 18px;
+                font-size: 14px;
+            }
+
+            .btn-row { margin-top: 36px; }
+
+            .home-btn {
+                padding: 13px 28px;
+                font-size: 14px;
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        /* Extra small */
+        @media (max-width: 360px) {
+            .sec-head h2 { font-size: 22px; }
+            .item .nm { font-size: 12px; }
+            .item .pr { font-size: 18px; }
         }
     </style>
 </head>
@@ -414,7 +640,13 @@ foreach($allItems as $row){
         <span>B K's Burger House</span>
     </a>
 
-    <div class="menu">
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu" id="navMenu">
         <a href="index.php">Home</a>
         <a href="dashboard.php">Dashboard</a>
         <a href="sales.php">Sales</a>
@@ -472,6 +704,23 @@ foreach($allItems as $row){
 </div>
 
 <script>
+    /* Hamburger menu */
+    const hamburger = document.getElementById("hamburger");
+    const navMenu = document.getElementById("navMenu");
+
+    hamburger.addEventListener("click", function () {
+        hamburger.classList.toggle("active");
+        navMenu.classList.toggle("open");
+    });
+
+    navMenu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            hamburger.classList.remove("active");
+            navMenu.classList.remove("open");
+        });
+    });
+
+    /* Filter + Search */
     const chips = document.querySelectorAll("#filters button");
     const search = document.getElementById("search");
     let activeCat = "all";

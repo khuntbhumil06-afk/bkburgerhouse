@@ -62,9 +62,10 @@ function money($v)
                 radial-gradient(circle at 100% 100%, rgba(255,183,3,.14), transparent 40%),
                 var(--bg);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* ---------- HEADER (index.php jevo) ---------- */
+        /* ---------- HEADER ---------- */
         .header {
             background: #0b0b0b;
             font-family: 'Poppins', sans-serif;
@@ -74,7 +75,9 @@ function money($v)
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
@@ -85,6 +88,7 @@ function money($v)
             text-decoration: none;
             font-size: 20px;
             font-weight: 700;
+            z-index: 1001;
         }
 
         .brand img {
@@ -97,7 +101,6 @@ function money($v)
             display: flex;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
         }
 
         .menu a {
@@ -112,11 +115,33 @@ function money($v)
             color: #ff4d4d;
         }
 
-        @media (max-width: 700px) {
-            .header { padding: 10px 16px; }
-            .menu { gap: 14px; }
-            .menu a { font-size: 14px; }
-            .brand { font-size: 17px; }
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* ---------- PAGE ---------- */
@@ -285,6 +310,169 @@ function money($v)
             transform: translateY(4px);
             box-shadow: 0 1px 0 var(--red2);
         }
+
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablets */
+        @media (max-width: 900px) {
+            .header { padding: 12px 28px; }
+            .wrap { padding: 0 18px 70px; }
+            .hero { padding: 40px 0 28px; }
+            .cards {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+            }
+        }
+
+        /* Mobile landscape / large phones */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 18px;
+            }
+
+            .hamburger { display: flex; }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 90px 30px 40px;
+                gap: 8px;
+                transition: right .35s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,.5);
+                z-index: 999;
+            }
+
+            .menu.open { right: 0; }
+
+            .menu a {
+                font-size: 18px;
+                padding: 12px 0;
+                width: 100%;
+                border-bottom: 1px solid #222;
+            }
+
+            .hero {
+                padding: 32px 0 24px;
+            }
+
+            .hero h1 {
+                font-size: clamp(48px, 14vw, 72px);
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                max-width: 100%;
+            }
+
+            .card {
+                padding: 24px 22px 26px;
+                border-radius: 22px;
+            }
+
+            .card:hover {
+                transform: translateY(-4px);
+            }
+
+            .card::before {
+                width: 140px;
+                height: 140px;
+                top: -50px;
+                right: -50px;
+            }
+
+            .card .ico {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
+
+            .card h3 {
+                font-size: clamp(48px, 14vw, 68px);
+            }
+
+            .btn-row { margin-top: 32px; }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .brand { font-size: 16px; gap: 8px; }
+            .brand img { width: 32px; height: 32px; }
+
+            .wrap { padding: 0 14px 50px; }
+
+            .hero {
+                padding: 26px 0 20px;
+            }
+
+            .hi {
+                font-size: 11px;
+                letter-spacing: 2.5px;
+            }
+
+            .hero h1 {
+                font-size: clamp(42px, 16vw, 58px);
+                letter-spacing: 1px;
+            }
+
+            .card {
+                padding: 20px 18px 22px;
+                border-radius: 18px;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+
+            .card::before {
+                width: 110px;
+                height: 110px;
+                top: -40px;
+                right: -40px;
+            }
+
+            .card .ico {
+                width: 46px;
+                height: 46px;
+                font-size: 22px;
+            }
+
+            .card h2 {
+                font-size: 11px;
+                margin-top: 18px;
+            }
+
+            .card h3 {
+                font-size: clamp(40px, 16vw, 56px);
+            }
+
+            .card .note {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+
+            .btn-row { margin-top: 28px; }
+
+            .home-btn {
+                padding: 13px 28px;
+                font-size: 14px;
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        /* Extra small */
+        @media (max-width: 360px) {
+            .card h3 {
+                font-size: 36px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -295,7 +483,13 @@ function money($v)
         <span>B K's Burger House</span>
     </a>
 
-    <div class="menu">
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu" id="navMenu">
         <a href="index.php">Home</a>
         <a href="dashboard.php">Dashboard</a>
         <a href="sales.php">Sales</a>
@@ -333,6 +527,22 @@ function money($v)
 </div>
 
 <script>
+    /* Hamburger menu */
+    const hamburger = document.getElementById("hamburger");
+    const navMenu = document.getElementById("navMenu");
+
+    hamburger.addEventListener("click", function () {
+        hamburger.classList.toggle("active");
+        navMenu.classList.toggle("open");
+    });
+
+    navMenu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            hamburger.classList.remove("active");
+            navMenu.classList.remove("open");
+        });
+    });
+
     // Number 0 thi dhire dhire vadhine asli value par aave (animation)
     document.querySelectorAll(".num").forEach(function (el) {
         const target = parseFloat(el.dataset.value) || 0;

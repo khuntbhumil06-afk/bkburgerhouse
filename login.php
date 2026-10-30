@@ -124,10 +124,15 @@ function e($value) {
             padding: 0;
         }
 
+        html, body {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             color: var(--ink);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             background:
@@ -144,6 +149,10 @@ function e($value) {
             background:
                 radial-gradient(circle at 8% -5%, rgba(230,57,70,.30), transparent 40%),
                 radial-gradient(circle at 100% 100%, rgba(255,183,3,.16), transparent 40%);
+        }
+
+        img {
+            max-width: 100%;
         }
 
         /* ---------- TOP BRAND ---------- */
@@ -193,6 +202,10 @@ function e($value) {
             animation: fadeIn .8s ease;
         }
 
+        .login-box > * {
+            min-width: 0;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -230,7 +243,7 @@ function e($value) {
         .promo h1 {
             font-family: 'Bebas Neue', sans-serif;
             font-weight: 400;
-            font-size: clamp(60px, 9vw, 92px);
+            font-size: clamp(56px, 9vw, 92px);
             line-height: .92;
             letter-spacing: 2px;
             margin: 8px 0 16px;
@@ -410,21 +423,69 @@ function e($value) {
             text-decoration: underline;
         }
 
-        /* ---------- MOBILE ---------- */
+        /* ---------- RESPONSIVE ---------- */
+
+        /* iPhone / touch: "fixed" background kaam nathi karto */
+        @media (max-width: 900px), (hover: none) {
+            body {
+                background:
+                    linear-gradient(rgba(15,13,12,.88), rgba(15,13,12,.92)),
+                    url('Assets/bg.png') center / cover scroll,
+                    var(--bg);
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 900px) {
+            .promo { padding: 36px 30px; }
+            .formside { padding: 36px 30px; }
+        }
+
+        /* Mobile: promo upar nano banner, form niche */
         @media (max-width: 760px) {
             .top { padding: 14px 18px; }
+            .container { align-items: flex-start; padding: 8px 14px 36px; }
             .login-box {
                 grid-template-columns: 1fr;
                 min-height: 0;
                 max-width: 440px;
+                border-radius: 22px;
             }
             .promo { padding: 28px 26px 30px; }
             .promo::after { display: none; }
             .promo h1 { font-size: 56px; margin-bottom: 8px; }
             .promo p { display: none; }
             .float.f2, .float.f3 { display: none; }
+            .float.f1 { font-size: 36px; right: 20px; top: 20px; }
             .formside { padding: 30px 26px 34px; }
             h2 { font-size: 44px; }
+
+            /* 16px thi nana font par iPhone auto-zoom kare chhe */
+            input { font-size: 16px; }
+            .eye { padding: 10px; font-size: 20px; }
+        }
+
+        /* Nano phone */
+        @media (max-width: 380px) {
+            .brand { font-size: 17px; }
+            .brand img { width: 32px; height: 32px; }
+            .container { padding: 6px 10px 30px; }
+            .promo { padding: 24px 20px; }
+            .promo h1 { font-size: 46px; }
+            .formside { padding: 26px 20px 30px; }
+            h2 { font-size: 38px; }
+            .register-link { font-size: 13px; }
+        }
+
+        /* Landscape phone: ochhi height */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container { align-items: flex-start; padding-bottom: 24px; }
+            .login-box { min-height: 0; }
+            .promo, .formside { padding-top: 24px; padding-bottom: 24px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .float, .login-box { animation: none; }
         }
     </style>
 </head>

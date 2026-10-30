@@ -63,11 +63,12 @@ body {
     background-attachment: fixed;
     overflow-x: hidden;
 }
+img { max-width: 100%; }
 a { color: inherit; }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-/* ---------- NAV (index.php jevo header) ---------- */
-.nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; }
+/* ---------- NAV ---------- */
+.nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; position: sticky; top: 0; z-index: 500; }
 .nav .wrap {
     max-width: none;
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -78,6 +79,10 @@ a { color: inherit; }
     font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700;
 }
 .brand img { width: 38px; height: 38px; object-fit: contain; }
+.nav-toggle {
+    display: none; background: none; border: 0; color: #fff;
+    font-size: 30px; line-height: 1; cursor: pointer; padding: 0 4px; margin-left: auto;
+}
 .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .links > a {
     text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif;
@@ -92,16 +97,28 @@ a { color: inherit; }
 }
 .dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
 .dropdown a:hover { background: var(--red2); }
-@media (max-width: 700px) {
+
+@media (max-width: 800px) {
     .nav .wrap { padding: 10px 16px; }
-    .links { gap: 16px; }
-    .links > a { font-size: 15px; }
     .brand { font-size: 18px; }
+    .nav-toggle { display: block; }
+    .links {
+        display: none; width: 100%; flex-direction: column; align-items: flex-start;
+        gap: 4px; padding: 10px 0 6px; border-top: 1px solid #333;
+    }
+    .links.open { display: flex; }
+    .links > a { font-size: 16px; padding: 10px 0; width: 100%; }
+    .profile { margin: 6px 0 0; width: 100%; }
+    .dropdown { position: static; margin-top: 10px; width: 100%; box-shadow: none; }
+}
+@media (max-width: 380px) {
+    .brand { font-size: 16px; }
+    .brand img { width: 32px; height: 32px; }
 }
 
 /* ---------- BUTTONS ---------- */
 .btn {
-    display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; cursor: pointer;
     font-family: inherit; font-weight: 800; font-size: 14px; border: none;
     padding: 13px 28px; border-radius: 999px; transition: .15s;
 }
@@ -112,11 +129,12 @@ a { color: inherit; }
 .btn.ghost:hover { background: var(--gold); color: #000; }
 
 /* ---------- HERO / STORY ---------- */
-.story { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; padding: 70px 0 70px; }
+.story { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; padding: 70px 20px; }
+.story > * { min-width: 0; }
 .hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; }
 .story h1 {
     font-family: 'Bebas Neue', sans-serif; font-weight: 400;
-    font-size: clamp(50px, 8vw, 92px); line-height: .92; letter-spacing: 2px; margin: 8px 0 20px;
+    font-size: clamp(46px, 8vw, 92px); line-height: .92; letter-spacing: 2px; margin: 8px 0 20px;
 }
 .story h1 span { color: transparent; -webkit-text-stroke: 2px var(--red); }
 .story p { color: #d8ccbf; line-height: 1.75; margin-bottom: 14px; font-size: 15px; }
@@ -162,7 +180,7 @@ a { color: inherit; }
 
 /* ---------- HOW WE MAKE IT ---------- */
 .sec-head { text-align: center; padding: 80px 0 34px; }
-.sec-head h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(40px, 7vw, 70px); letter-spacing: 2px; line-height: 1; margin-top: 6px; }
+.sec-head h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(38px, 7vw, 70px); letter-spacing: 2px; line-height: 1; margin-top: 6px; }
 .sec-head h2 span { color: transparent; -webkit-text-stroke: 2px var(--gold); }
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .step {
@@ -184,7 +202,7 @@ a { color: inherit; }
 .step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
 /* ---------- CTA TICKET ---------- */
-.ticket-sec { padding: 80px 0; }
+.ticket-sec { padding: 80px 20px; }
 .ticket {
     position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
     background: var(--paper); color: var(--paper-ink); border-radius: 26px; padding: 38px 44px;
@@ -196,12 +214,12 @@ a { color: inherit; }
 .ticket::before { left: -18px; }
 .ticket::after  { right: -18px; }
 .ticket .tag { font-size: 11px; letter-spacing: 3px; font-weight: 800; color: var(--red); }
-.ticket h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(36px, 6vw, 58px); letter-spacing: 1.5px; line-height: 1; margin-top: 4px; }
+.ticket h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(34px, 6vw, 58px); letter-spacing: 1.5px; line-height: 1; margin-top: 4px; }
 .ticket p { color: #7a6a4f; margin-top: 6px; font-size: 14px; }
 .ticket .btn { background: var(--red); color: #fff; box-shadow: 0 5px 0 var(--red2); font-size: 16px; padding: 16px 34px; text-transform: uppercase; letter-spacing: 1px; }
 .ticket .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--red2); }
 
-/* ---------- FOOTER (index.php jevo) ---------- */
+/* ---------- FOOTER ---------- */
 .site-footer {
     background: #111; color: #fff; font-family: 'Poppins', sans-serif;
     padding: 48px 45px 56px; margin-top: 0;
@@ -210,9 +228,10 @@ a { color: inherit; }
     display: grid; grid-template-columns: 1.3fr .9fr 1.45fr 1fr .95fr; gap: 34px;
     max-width: 1500px; margin: 0 auto; align-items: start;
 }
+.ft-wrap > * { min-width: 0; }
 .site-footer h3 { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 500; letter-spacing: 0; margin-bottom: 14px; color: #fff; }
 .site-footer h5 { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 500; letter-spacing: 0; margin-bottom: 14px; color: #fff; }
-.site-footer p { font-size: 15px; font-weight: 500; line-height: 1.65; color: #fff; margin-bottom: 14px; }
+.site-footer p { font-size: 15px; font-weight: 500; line-height: 1.65; color: #fff; margin-bottom: 14px; word-break: break-word; }
 .site-footer a { color: #fff; text-decoration: none; font-weight: 500; transition: color .2s; }
 .site-footer a:hover { color: #ff4d4d; }
 .site-footer ul { list-style: none; }
@@ -239,25 +258,45 @@ a { color: inherit; }
 }
 @media (max-width: 560px) {
     .site-footer { padding: 36px 20px 40px; }
-    .ft-wrap { grid-template-columns: 1fr; }
+    .ft-wrap { grid-template-columns: 1fr; text-align: center; }
+    .ft-social { justify-content: center; }
+    .ft-sub form { max-width: 320px; margin: 0 auto; }
+    .site-footer h3 { font-size: 22px; }
+    .site-footer h5 { font-size: 20px; }
 }
 
 /* ---------- REVEAL ---------- */
 .reveal { opacity: 0; transform: translateY(40px); transition: .7s ease; }
 .reveal.show { opacity: 1; transform: none; }
 
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px), (hover: none) {
+    body { background-attachment: scroll; }
+}
 @media (max-width: 900px) {
-    .story { grid-template-columns: 1fr; gap: 40px; padding-top: 50px; }
+    .story { grid-template-columns: 1fr; gap: 40px; padding-top: 50px; padding-bottom: 50px; }
+    .photo { max-width: 460px; margin: 0 auto; width: 100%; }
     .steps { grid-template-columns: repeat(2, 1fr); }
-    .fgrid { grid-template-columns: 1fr 1fr; }
+    .sec-head { padding: 60px 0 26px; }
+    .ticket-sec { padding: 60px 20px; }
 }
 @media (max-width: 560px) {
     .steps { grid-template-columns: 1fr; }
-    .fgrid { grid-template-columns: 1fr; }
-    .ticket { padding: 30px 24px; }
+    .sec-head { padding: 46px 0 22px; }
+    .ticket-sec { padding: 46px 16px; }
+    .ticket { padding: 30px 24px; text-align: center; justify-content: center; }
+    .ticket .btn { width: 100%; }
+    .ticket::before, .ticket::after { display: none; }
+    .cta-row .btn { flex: 1 1 100%; }
+    .photo { padding: 0 14px 22px 0; }
     .photo .frame { box-shadow: 10px 10px 0 var(--red), 0 25px 60px rgba(0,0,0,.6); }
     .badge { width: 104px; height: 104px; }
     .badge b { font-size: 40px; }
+    .marquee div { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .badge, .marquee div { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
 }
 </style>
 </head>
@@ -267,7 +306,8 @@ a { color: inherit; }
 <nav class="nav">
     <div class="wrap">
         <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
-        <div class="links">
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+        <div class="links" id="navLinks">
             <a href="index.php">Home</a>
             <a href="menu.php">Menu</a>
             <a href="cart.php">Cart</a>
@@ -395,7 +435,7 @@ a { color: inherit; }
         <div class="ft-loc">
             <h5>Location</h5>
             <iframe src="https://maps.google.com/maps?q=MotaVarachha,Surat&output=embed" allowfullscreen loading="lazy" title="Map"></iframe>
-            <p><a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House,Sudama Chowk,Mota Varachha, Surat ,Gujarat</a></p>
+            <p><a href="<?= h($mapLink) ?>" target="_blank">Ajay's Burger House, Sudama Chowk, Mota Varachha, Surat, Gujarat</a></p>
             <p><a href="mailto:burgerhousebk28@gmail.com"><i class="bi bi-envelope-fill"></i> burgerhousebk28@gmail.com</a></p>
             <p><a href="https://wa.me/919904522025" target="_blank">💬 +91 99045 22025</a></p>
         </div>
@@ -407,7 +447,7 @@ a { color: inherit; }
         </div>
 
         <div class="ft-sub">
-            <h5>NewSubscribe</h5>
+            <h5>Subscribe</h5>
             <form action="newsletter.php" method="POST" onsubmit="return validateEmail()">
                 <input type="text" id="name" name="name" placeholder="Enter Name">
                 <div id="nameError" class="error"></div>
@@ -423,7 +463,7 @@ a { color: inherit; }
 
 <script src="js/main.js"></script>
 <script>
-/* Profile dropdown */
+/* Profile dropdown + mobile hamburger */
 document.addEventListener("DOMContentLoaded", function () {
     const btn = document.getElementById("profileBtn");
     const menu = document.getElementById("dropMenu");
@@ -433,6 +473,14 @@ document.addEventListener("DOMContentLoaded", function () {
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         });
         document.addEventListener("click", function () { menu.style.display = "none"; });
+    }
+
+    const toggle = document.getElementById("navToggle");
+    const links = document.getElementById("navLinks");
+    if (toggle && links) {
+        toggle.addEventListener("click", function () {
+            links.classList.toggle("open");
+        });
     }
 });
 
@@ -483,7 +531,7 @@ function validateEmail() {
     if (email.trim() === "") {
         emailError.innerText = "⚠ Please enter your Email!";
         isValid = false;
-    } else if (!/^[^ ]+@[^ ]+\.[a-z]{2,3}$/.test(email)) {
+    } else if (!/^[^ ]+@[^ ]+\.[a-z]{2,}$/.test(email)) {
         emailError.innerText = "⚠ Invalid email format!";
         isValid = false;
     }

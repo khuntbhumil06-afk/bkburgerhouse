@@ -125,11 +125,13 @@ foreach ($orders as $o) {
       radial-gradient(circle at 100% 100%, rgba(255,183,3,.14), transparent 40%),
       var(--bg);
     background-attachment: fixed;
+    overflow-x: hidden;
   }
+  img { max-width: 100%; }
   .page { max-width: 1040px; margin: 0 auto; padding: 22px 20px 90px; }
 
-  /* ---------- NAV (index.php jevo header) ---------- */
-  .nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; }
+  /* ---------- NAV ---------- */
+  .nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; position: sticky; top: 0; z-index: 1500; }
   .nav .wrap {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
     padding: 12px 45px; min-height: 64px; flex-wrap: wrap;
@@ -139,6 +141,10 @@ foreach ($orders as $o) {
     font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0;
   }
   .nav .brand img { width: 38px; height: 38px; object-fit: contain; }
+  .nav-toggle {
+    display: none; background: none; border: 0; color: #fff;
+    font-size: 30px; line-height: 1; cursor: pointer; padding: 0 4px; margin-left: auto;
+  }
   .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
   .links > a { text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 17px; transition: color .2s; }
   .links > a:hover { color: #ff4d4d; }
@@ -147,30 +153,42 @@ foreach ($orders as $o) {
   .dropdown { display: none; position: absolute; right: 0; top: 52px; min-width: 150px; z-index: 2000; background: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
   .dropdown a { display: block; padding: 11px 16px; text-decoration: none; color: #fff; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
   .dropdown a:hover { background: var(--red2); }
-  @media (max-width: 700px) {
+
+  @media (max-width: 800px) {
     .nav .wrap { padding: 10px 16px; }
-    .links { gap: 16px; }
-    .links > a { font-size: 15px; }
     .nav .brand { font-size: 18px; }
+    .nav-toggle { display: block; }
+    .links {
+      display: none; width: 100%; flex-direction: column; align-items: flex-start;
+      gap: 4px; padding: 10px 0 6px; border-top: 1px solid #333;
+    }
+    .links.open { display: flex; }
+    .links > a { font-size: 16px; padding: 10px 0; width: 100%; }
+    .profile { margin: 6px 0 0; width: 100%; }
+    .dropdown { position: static; margin-top: 10px; width: 100%; box-shadow: none; }
+  }
+  @media (max-width: 380px) {
+    .nav .brand { font-size: 16px; }
+    .nav .brand img { width: 32px; height: 32px; }
   }
 
   /* ---------- HERO ---------- */
   .hero { margin: 38px 0 28px; }
-  .hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; }
+  .hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; word-break: break-word; }
   .hero h1 {
     font-family: 'Bebas Neue', sans-serif; font-weight: 400;
-    font-size: clamp(54px, 11vw, 104px); line-height: .9; letter-spacing: 2px; margin-top: 6px;
+    font-size: clamp(50px, 11vw, 104px); line-height: .9; letter-spacing: 2px; margin-top: 6px;
   }
   .hero h1 span { color: transparent; -webkit-text-stroke: 2px var(--red); }
 
   /* ---------- STATS ---------- */
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 34px; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 14px; margin-bottom: 34px; }
   .metric {
     display: flex; align-items: center; gap: 16px;
     background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px 20px;
   }
   .metric .ico {
-    width: 54px; height: 54px; border-radius: 50%; background: var(--card2);
+    flex: 0 0 54px; height: 54px; border-radius: 50%; background: var(--card2);
     display: flex; align-items: center; justify-content: center; font-size: 24px;
     box-shadow: inset 0 0 0 2px rgba(255,183,3,.35);
   }
@@ -184,6 +202,7 @@ foreach ($orders as $o) {
     background: var(--card); border: 1px solid var(--line); border-radius: 24px; overflow: hidden;
     box-shadow: 0 14px 40px rgba(0,0,0,.45);
   }
+  .card > * { min-width: 0; }
   .stub {
     position: relative; display: flex; flex-direction: column; gap: 4px;
     padding: 24px 22px;
@@ -206,11 +225,11 @@ foreach ($orders as $o) {
   .stub-total strong { display: block; font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 40px; letter-spacing: 1px; }
 
   .body { padding: 24px 28px 26px; min-width: 0; }
-  .items { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+  .items { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 8px; }
   .items li {
     display: flex; align-items: center; gap: 10px;
     background: var(--card2); border-radius: 12px; padding: 9px 12px;
-    font-size: 13px; font-weight: 600; line-height: 1.3;
+    font-size: 13px; font-weight: 600; line-height: 1.3; word-break: break-word;
   }
   .items li i { font-style: normal; font-size: 20px; }
 
@@ -256,7 +275,7 @@ foreach ($orders as $o) {
   /* ---------- MAP TRACKING ---------- */
   .trackbar { margin-top: 24px; }
   .maptoggle {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     background: var(--gold); color: #000; border: none; cursor: pointer;
     font-family: inherit; font-weight: 800; font-size: 14px;
     padding: 12px 22px; border-radius: 999px; transition: .2s;
@@ -297,7 +316,13 @@ foreach ($orders as $o) {
     font-weight: 800; padding: 13px 28px; border-radius: 999px; box-shadow: 0 4px 0 var(--red2);
   }
 
-  @media (max-width: 760px) {
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 900px), (hover: none) {
+    body { background-attachment: scroll; }
+  }
+  @media (max-width: 860px) {
+    .page { padding: 16px 16px 70px; }
+    .hero { margin: 28px 0 22px; }
     .card { grid-template-columns: 1fr; }
     .stub { display: grid; grid-template-columns: 1fr auto; align-items: end; padding: 18px 20px; }
     .stub::after { display: none; }
@@ -305,11 +330,31 @@ foreach ($orders as $o) {
     .stub-total { grid-column: 2; grid-row: 1 / span 4; margin: 0; padding: 0; text-align: right; }
     .oid { font-size: 46px; }
     .body { padding: 20px 18px 22px; }
+  }
+  @media (max-width: 600px) {
     .items { grid-template-columns: 1fr; }
-    .sname { font-size: 10px; }
+    .sname { font-size: 10px; line-height: 1.2; }
     .sico { width: 38px; height: 38px; font-size: 17px; }
-    .stops::before, .stops::after { top: 16px; }
+    .stops::before, .stops::after { top: 16px; height: 4px; }
+    .rider-ico { font-size: 24px; top: -30px; }
+    .maptoggle { width: 100%; }
     .mapbox { height: 300px; }
+    .mapinfo { font-size: 13px; padding: 10px 14px; }
+    .empty { padding: 44px 16px; }
+    .empty h2 { font-size: 36px; }
+  }
+  @media (max-width: 400px) {
+    .page { padding: 12px 12px 60px; }
+    .metric { padding: 14px 16px; gap: 12px; }
+    .metric strong { font-size: 34px; }
+    .oid { font-size: 40px; }
+    .stub-total strong { font-size: 32px; }
+    .stub { padding: 16px; }
+    .body { padding: 16px 14px 18px; }
+    .mapbox { height: 260px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rider-ico, .stop.now .sico, .pin.rider { animation: none; }
   }
 </style>
 </head>
@@ -317,7 +362,8 @@ foreach ($orders as $o) {
 <nav class="nav">
   <div class="wrap">
     <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
-    <div class="links">
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    <div class="links" id="navLinks">
       <a href="index.php">Home</a>
       <a href="menu.php">Menu</a>
       <a href="cart.php">Cart</a>
@@ -430,6 +476,15 @@ document.addEventListener("DOMContentLoaded", function () {
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         });
         document.addEventListener("click", function () { menu.style.display = "none"; });
+    }
+
+    // Mobile hamburger menu
+    const toggle = document.getElementById("navToggle");
+    const links = document.getElementById("navLinks");
+    if (toggle && links) {
+        toggle.addEventListener("click", function () {
+            links.classList.toggle("open");
+        });
     }
 });
 </script>

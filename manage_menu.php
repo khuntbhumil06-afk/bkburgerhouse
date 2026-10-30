@@ -301,9 +301,10 @@ foreach ($products as $p) {
                 radial-gradient(circle at 100% 60%, rgba(255,183,3,.12), transparent 40%),
                 var(--bg);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* ---------- HEADER (index.php jevo) ---------- */
+        /* ---------- HEADER ---------- */
         .nav-container {
             position: sticky;
             top: 0;
@@ -316,7 +317,6 @@ foreach ($products as $p) {
             gap: 16px;
             padding: 12px 45px;
             min-height: 64px;
-            flex-wrap: wrap;
         }
 
         .brand {
@@ -327,6 +327,7 @@ foreach ($products as $p) {
             text-decoration: none;
             font-size: 20px;
             font-weight: 700;
+            z-index: 1001;
         }
 
         .brand img {
@@ -339,7 +340,6 @@ foreach ($products as $p) {
             display: flex;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
         }
 
         .nav-right > a {
@@ -399,11 +399,33 @@ foreach ($products as $p) {
             background: var(--red2);
         }
 
-        @media (max-width: 700px) {
-            .nav-container { padding: 10px 16px; }
-            .nav-right { gap: 14px; }
-            .nav-right > a { font-size: 14px; }
-            .brand { font-size: 17px; }
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* ---------- PAGE ---------- */
@@ -698,6 +720,7 @@ foreach ($products as $p) {
 
         .table-wrap {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
@@ -897,10 +920,290 @@ foreach ($products as $p) {
             cursor: pointer;
         }
 
-        @media (max-width: 760px) {
-            .add-grid { grid-template-columns: 1fr; }
-            .slip { padding: 26px 20px; }
-            .slip .cut { margin: 14px -20px 20px; }
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablets */
+        @media (max-width: 900px) {
+            .nav-container { padding: 12px 28px; }
+            .page { padding: 0 18px 70px; }
+            .add-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .add-grid .field:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Mobile landscape / large phones */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 10px 18px;
+            }
+
+            .hamburger { display: flex; }
+
+            .nav-right {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 90px 30px 40px;
+                gap: 8px;
+                transition: right .35s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,.5);
+                z-index: 999;
+            }
+
+            .nav-right.open { right: 0; }
+
+            .nav-right > a {
+                font-size: 18px;
+                padding: 12px 0;
+                width: 100%;
+                border-bottom: 1px solid #222;
+            }
+
+            .profile {
+                margin: 20px 0 0;
+                width: 100%;
+            }
+
+            .profile img {
+                width: 48px;
+                height: 48px;
+            }
+
+            .dropdown {
+                position: static;
+                display: none;
+                margin-top: 10px;
+                width: 100%;
+                border-radius: 10px;
+            }
+
+            .dropdown.show { display: block; }
+            .dropdown a { padding: 12px 16px; }
+
+            .hero {
+                padding: 32px 0 22px;
+            }
+
+            .hero h1 {
+                font-size: clamp(48px, 14vw, 72px);
+            }
+
+            .slip {
+                padding: 26px 22px 24px;
+                border-radius: 20px;
+            }
+
+            .slip::before,
+            .slip::after {
+                display: none;
+            }
+
+            .slip h2 {
+                font-size: 36px;
+            }
+
+            .slip .cut {
+                margin: 14px -22px 18px;
+            }
+
+            .add-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .upload {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .preview {
+                width: 76px;
+                height: 76px;
+                font-size: 28px;
+            }
+
+            .sec-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .sec-head h2 {
+                font-size: 36px;
+            }
+
+            .filters {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .filters button {
+                flex-shrink: 0;
+                font-size: 12px;
+                padding: 7px 14px;
+            }
+
+            table {
+                min-width: 640px;
+            }
+
+            .thumb {
+                width: 56px;
+                height: 56px;
+                border-radius: 12px;
+            }
+
+            .name {
+                font-size: 20px;
+            }
+
+            .edit-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .edit-form input[type="text"],
+            .edit-form input[type="number"],
+            .edit-form select,
+            .edit-form input[type="file"] {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .brand { font-size: 16px; gap: 8px; }
+            .brand img { width: 32px; height: 32px; }
+
+            .page { padding: 0 14px 50px; }
+
+            .hero {
+                padding: 26px 0 18px;
+            }
+
+            .hi {
+                font-size: 11px;
+                letter-spacing: 2.5px;
+            }
+
+            .hero h1 {
+                font-size: clamp(42px, 16vw, 58px);
+                letter-spacing: 1px;
+            }
+
+            .flash {
+                padding: 12px 16px;
+                font-size: 13px;
+                border-radius: 12px;
+            }
+
+            .slip {
+                padding: 22px 16px 20px;
+                border-radius: 16px;
+                margin-bottom: 30px;
+            }
+
+            .slip h2 {
+                font-size: 30px;
+            }
+
+            .slip .hint {
+                font-size: 12px;
+            }
+
+            .slip .cut {
+                margin: 12px -16px 16px;
+            }
+
+            .field label {
+                font-size: 10px;
+            }
+
+            .slip input[type="text"],
+            .slip input[type="number"],
+            .slip select {
+                font-size: 14px;
+            }
+
+            .preview {
+                width: 68px;
+                height: 68px;
+                font-size: 24px;
+                border-radius: 14px;
+            }
+
+            .add-btn {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .sec-head h2 {
+                font-size: 30px;
+            }
+
+            .filters button {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+
+            .table-card {
+                border-radius: 16px;
+            }
+
+            th {
+                padding: 12px 10px;
+                font-size: 11px;
+            }
+
+            td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .thumb {
+                width: 48px;
+                height: 48px;
+                border-radius: 10px;
+            }
+
+            .name {
+                font-size: 18px;
+            }
+
+            .cat-tag {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+
+            .price {
+                font-size: 14px;
+            }
+
+            .btn,
+            .actions button {
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+        }
+
+        /* Extra small */
+        @media (max-width: 360px) {
+            .slip h2 { font-size: 26px; }
+            .sec-head h2 { font-size: 26px; }
+            .name { font-size: 16px; }
         }
     </style>
 </head>
@@ -912,7 +1215,13 @@ foreach ($products as $p) {
             <span>B K's Burger House</span>
         </a>
 
-        <nav class="nav-right">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <nav class="nav-right" id="navMenu">
             <a href="index.php">Home</a>
             <a href="sales.php">Sales</a>
             <a href="dashboard.php">Dashboard</a>
@@ -1063,17 +1372,38 @@ foreach ($products as $p) {
     </div>
 
     <script>
+        /* Hamburger menu */
+        const hamburger = document.getElementById("hamburger");
+        const navMenu = document.getElementById("navMenu");
+
+        hamburger.addEventListener("click", function () {
+            hamburger.classList.toggle("active");
+            navMenu.classList.toggle("open");
+        });
+
+        navMenu.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                hamburger.classList.remove("active");
+                navMenu.classList.remove("open");
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const btn = document.getElementById("profileBtn");
             const menu = document.getElementById("dropMenu");
 
             btn.addEventListener("click", function (e) {
                 e.stopPropagation();
-                menu.style.display = menu.style.display === "block" ? "none" : "block";
+                if (window.innerWidth <= 768) {
+                    menu.classList.toggle("show");
+                } else {
+                    menu.style.display = menu.style.display === "block" ? "none" : "block";
+                }
             });
 
             document.addEventListener("click", function () {
                 menu.style.display = "none";
+                menu.classList.remove("show");
             });
 
             /* Category filter chips */

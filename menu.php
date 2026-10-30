@@ -936,6 +936,113 @@ body {
     .cm-main-head { padding: 14px 14px 4px; }
     .tile-grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
 }
+
+/* ========== RESPONSIVE PATCH (mobile + tablet) ========== */
+img { max-width: 100%; }
+html, body { overflow-x: hidden; }
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+@media (max-width: 900px), (hover: none) {
+    body { background-attachment: scroll; }
+}
+
+@media (max-width: 900px) {
+    .nav-container { flex-wrap: wrap; gap: 10px; padding: 10px 15px; }
+    .brand { font-size: 18px; }
+    .brand img { width: 38px; height: 38px; }
+    .nav-toggle { display: block; margin-left: auto; }
+
+    .search-box { order: 3; flex: 1 1 100%; max-width: 100%; }
+
+    .nav-right {
+        order: 4;
+        display: none;
+        flex: 1 1 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        border-top: 1px solid #333;
+        padding-top: 8px;
+    }
+    .nav-right.open { display: flex; }
+    .nav-right > a { padding: 10px 12px; }
+
+    .profile { margin: 6px 0 0; }
+    .dropdown { position: static; margin-top: 8px; width: 100%; }
+
+    .category-bar {
+        position: static;
+        justify-content: flex-start;
+        gap: 10px;
+        margin: 12px 10px;
+    }
+    .category-buttons {
+        flex: 1;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+    .category-buttons::-webkit-scrollbar { display: none; }
+    .category-buttons button { flex: 0 0 auto; white-space: nowrap; }
+    .cart-icon { margin-left: 0; flex: 0 0 auto; }
+}
+
+@media (max-width: 768px) {
+    .food-wrapper { overflow: visible; }
+    .arrow-btn { display: none; }
+
+    .food-items {
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow-x: visible;
+        white-space: normal;
+        gap: 14px;
+        padding: 10px 12px;
+    }
+    .food {
+        flex: 0 1 calc(50% - 7px);
+        min-width: 0;
+        width: auto;
+        height: auto;
+        padding: 10px 10px 14px;
+    }
+    .food img { height: 160px; }
+    .food h3 { font-size: 15px; margin: 8px 0; }
+    .food:hover { transform: none; }
+    .food:hover img { transform: none; }
+
+    .qty-box button { width: 34px; height: 34px; }
+    .add-btn, .wishlist-btn, .customise-btn { padding: 8px 14px; }
+}
+
+@media (max-width: 480px) {
+    .brand { font-size: 16px; }
+    .food { flex-basis: 100%; max-width: 360px; }
+    .food img { height: 220px; }
+}
+
+@media (max-width: 720px) {
+    .cm-box { height: 100vh; height: 100dvh; }
+    .cm-sec h4 { flex-wrap: wrap; }
+    .cm-qty { min-width: 100px; }
+}
+@media (max-width: 400px) {
+    .tile-grid { grid-template-columns: repeat(3, 1fr); gap: 8px 4px; }
+    .tile-img { width: 64px; height: 64px; font-size: 30px; }
+    .tile-name { font-size: 11px; }
+    .cm-main-head h3 { font-size: 20px; }
+    .cm-sec h4 .num { font-size: 28px; }
+}
 </style>
 </head>
 
@@ -946,6 +1053,7 @@ body {
         <img src="Assets/logo.png" alt="logo">
         <span>B K's Burger House</span>
     </a>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
 
     <div class="search-box">
         <input type="text" id="search" placeholder="Search Burger" onkeyup="searchBurger()">
@@ -1310,6 +1418,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("click", function () {
         if (menu) menu.style.display = "none";
     });
+
+    // Mobile hamburger menu
+    const navToggle = document.getElementById("navToggle");
+    if (navToggle) {
+        navToggle.addEventListener("click", function () {
+            document.querySelector(".nav-right").classList.toggle("open");
+        });
+    }
 });
 </script>
 

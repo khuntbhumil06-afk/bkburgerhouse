@@ -51,9 +51,10 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
                 radial-gradient(circle at 100% 50%, rgba(255,183,3,.12), transparent 40%),
                 var(--bg);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* ---------- HEADER (index.php jevo) ---------- */
+        /* ---------- HEADER ---------- */
         .header {
             background: #0b0b0b;
             font-family: 'Poppins', sans-serif;
@@ -63,7 +64,9 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
@@ -75,6 +78,7 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             font-family: 'Poppins', sans-serif;
             font-size: 20px;
             font-weight: 700;
+            z-index: 1001;
         }
 
         .brand img {
@@ -87,7 +91,6 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             display: flex;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
         }
 
         .menu > a {
@@ -145,11 +148,33 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             background: var(--red2);
         }
 
-        @media (max-width: 700px) {
-            .header { padding: 10px 16px; }
-            .menu { gap: 14px; }
-            .menu > a { font-size: 14px; }
-            .brand { font-size: 17px; }
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* ---------- MAIN ---------- */
@@ -293,7 +318,7 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             line-height: 1.05;
         }
 
-        /* ---------- FOOTER (index.php jevo) ---------- */
+        /* ---------- FOOTER ---------- */
         .site-footer {
             background: #111;
             color: #fff;
@@ -339,15 +364,211 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
         .ft-sub button:active { transform: scale(.97); }
         .ft-sub .error { color: red; font-size: 13px; margin: -8px 0 8px; text-align: left; }
 
-        @media (max-width: 1000px) {
-            .ft-wrap { grid-template-columns: 1fr 1fr; }
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablets */
+        @media (max-width: 1100px) {
+            .ft-wrap {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 28px;
+            }
         }
 
-        @media (max-width: 560px) {
-            .site-footer { padding: 36px 20px 40px; }
-            .ft-wrap { grid-template-columns: 1fr; }
-            .card { min-height: 190px; }
-            .card h2 { font-size: 60px; }
+        @media (max-width: 900px) {
+            .header { padding: 12px 28px; }
+            .main-container { padding: 36px 18px 60px; }
+            .cards {
+                grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                gap: 18px;
+            }
+            .ft-wrap {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Mobile landscape / large phones */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 18px;
+            }
+
+            .hamburger { display: flex; }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 90px 30px 40px;
+                gap: 8px;
+                transition: right .35s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,.5);
+                z-index: 999;
+            }
+
+            .menu.open { right: 0; }
+
+            .menu > a {
+                font-size: 18px;
+                padding: 12px 0;
+                width: 100%;
+                border-bottom: 1px solid #222;
+            }
+
+            .profile {
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .profile img {
+                width: 48px;
+                height: 48px;
+            }
+
+            .dropdown {
+                position: static;
+                display: none;
+                margin-top: 10px;
+                width: 100%;
+                border-radius: 10px;
+            }
+
+            .dropdown.show { display: block; }
+            .dropdown a { padding: 12px 16px; }
+
+            .main-container {
+                padding: 28px 16px 50px;
+            }
+
+            .hero { margin-bottom: 26px; }
+
+            .main-container h1 {
+                font-size: clamp(48px, 14vw, 72px);
+            }
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+
+            .card {
+                min-height: 180px;
+                padding: 18px 16px 16px;
+                border-radius: 20px;
+            }
+
+            .card:hover {
+                transform: translateY(-4px);
+            }
+
+            .card::before {
+                width: 110px;
+                height: 110px;
+                top: -40px;
+                right: -40px;
+            }
+
+            .card .ico {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+
+            .card .ico img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .card h2 {
+                font-size: 48px;
+                margin-top: 14px;
+            }
+
+            .card.wallet h2 {
+                font-size: 26px;
+            }
+
+            .card p {
+                font-size: 11px;
+                letter-spacing: 1px;
+            }
+
+            .card .go {
+                right: 16px;
+                bottom: 14px;
+                font-size: 18px;
+            }
+
+            .site-footer {
+                padding: 40px 24px 48px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .brand { font-size: 16px; gap: 8px; }
+            .brand img { width: 32px; height: 32px; }
+
+            .main-container {
+                padding: 24px 14px 40px;
+            }
+
+            .hi {
+                font-size: 11px;
+                letter-spacing: 2.5px;
+            }
+
+            .main-container h1 {
+                font-size: clamp(42px, 16vw, 58px);
+                letter-spacing: 1px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .card {
+                min-height: 160px;
+                padding: 18px 18px 16px;
+                border-radius: 18px;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+
+            .card h2 {
+                font-size: 52px;
+            }
+
+            .card.wallet h2 {
+                font-size: 28px;
+            }
+
+            .site-footer {
+                padding: 36px 18px 40px;
+            }
+
+            .ft-wrap {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .site-footer h3 { font-size: 22px; }
+            .site-footer h5 { font-size: 18px; }
+            .site-footer p,
+            .site-footer li { font-size: 15px; }
+        }
+
+        /* Extra small */
+        @media (max-width: 360px) {
+            .card h2 { font-size: 44px; }
+            .card.wallet h2 { font-size: 24px; }
         }
     </style>
 </head>
@@ -358,7 +579,13 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             <span>B K's Burger House</span>
         </a>
 
-        <div class="menu">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="menu" id="navMenu">
             <a href="index.php">Home</a>
             <a href="sales.php">Sales</a>
             <a href="manage_menu.php">Manage Menu</a>
@@ -467,7 +694,7 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             </div>
 
             <div class="ft-sub">
-                <h5>NewSubscribe</h5>
+                <h5>Newsletter</h5>
                 <form action="newsletter.php" method="POST" onsubmit="return validateEmail()">
                     <input type="text" id="name" name="name" placeholder="Enter Name">
                     <div id="nameError" class="error"></div>
@@ -482,6 +709,22 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
     </footer>
 
     <script>
+        /* Hamburger menu */
+        const hamburger = document.getElementById("hamburger");
+        const navMenu = document.getElementById("navMenu");
+
+        hamburger.addEventListener("click", function () {
+            hamburger.classList.toggle("active");
+            navMenu.classList.toggle("open");
+        });
+
+        navMenu.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                hamburger.classList.remove("active");
+                navMenu.classList.remove("open");
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const btn = document.getElementById("profileBtn");
             const menu = document.getElementById("dropMenu");
@@ -489,12 +732,19 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             if (btn) {
                 btn.addEventListener("click", function (e) {
                     e.stopPropagation();
-                    menu.style.display = menu.style.display === "block" ? "none" : "block";
+                    if (window.innerWidth <= 768) {
+                        menu.classList.toggle("show");
+                    } else {
+                        menu.style.display = menu.style.display === "block" ? "none" : "block";
+                    }
                 });
             }
 
             document.addEventListener("click", function () {
-                if (menu) menu.style.display = "none";
+                if (menu) {
+                    menu.style.display = "none";
+                    menu.classList.remove("show");
+                }
             });
         });
 

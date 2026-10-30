@@ -95,18 +95,24 @@ body {
         radial-gradient(circle at 100% 60%, rgba(255,183,3,.12), transparent 40%),
         var(--bg);
     background-attachment: fixed;
+    overflow-x: hidden;
 }
+img { max-width: 100%; }
 a { color: inherit; }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-/* ---------- NAV (index.php jevo header) ---------- */
-.nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; }
+/* ---------- NAV ---------- */
+.nav { background: #0b0b0b; font-family: 'Poppins', sans-serif; position: sticky; top: 0; z-index: 500; }
 .nav .wrap {
     max-width: none; display: flex; align-items: center; justify-content: space-between; gap: 16px;
     padding: 12px 45px; min-height: 64px; flex-wrap: wrap;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; }
 .brand img { width: 38px; height: 38px; object-fit: contain; }
+.nav-toggle {
+    display: none; background: none; border: 0; color: #fff;
+    font-size: 30px; line-height: 1; cursor: pointer; padding: 0 4px; margin-left: auto;
+}
 .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .links > a { text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 17px; transition: color .2s; }
 .links > a:hover { color: #ff4d4d; }
@@ -115,17 +121,29 @@ a { color: inherit; }
 .dropdown { display: none; position: absolute; right: 0; top: 52px; min-width: 150px; z-index: 200; background: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
 .dropdown a:hover { background: var(--red2); }
-@media (max-width: 700px) {
+
+@media (max-width: 800px) {
     .nav .wrap { padding: 10px 16px; }
-    .links { gap: 16px; }
-    .links > a { font-size: 15px; }
     .brand { font-size: 18px; }
+    .nav-toggle { display: block; }
+    .links {
+        display: none; width: 100%; flex-direction: column; align-items: flex-start;
+        gap: 4px; padding: 10px 0 6px; border-top: 1px solid #333;
+    }
+    .links.open { display: flex; }
+    .links > a { font-size: 16px; padding: 10px 0; width: 100%; }
+    .profile { margin: 6px 0 0; width: 100%; }
+    .dropdown { position: static; margin-top: 10px; width: 100%; box-shadow: none; }
+}
+@media (max-width: 380px) {
+    .brand { font-size: 16px; }
+    .brand img { width: 32px; height: 32px; }
 }
 
 /* ---------- HERO ---------- */
 .hero { padding: 44px 0 26px; }
-.hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; }
-.hero h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(54px, 10vw, 96px); line-height: .9; letter-spacing: 2px; margin-top: 6px; }
+.hi { color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; word-break: break-word; }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(50px, 10vw, 96px); line-height: .9; letter-spacing: 2px; margin-top: 6px; }
 .hero h1 span { color: transparent; -webkit-text-stroke: 2px var(--red); }
 
 /* ---------- PROFILE ID CARD ---------- */
@@ -134,6 +152,7 @@ a { color: inherit; }
     background: var(--card); border: 1px solid var(--line); border-radius: 26px; overflow: hidden;
     box-shadow: 0 18px 50px rgba(0,0,0,.5);
 }
+.idcard > * { min-width: 0; }
 .id-left {
     position: relative; text-align: center; padding: 34px 22px;
     background: linear-gradient(160deg, var(--red), var(--red2));
@@ -148,11 +167,12 @@ a { color: inherit; }
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .id-left h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 34px; letter-spacing: 1.5px; line-height: 1.05; word-break: break-word; }
-.id-left .un { font-size: 14px; color: rgba(255,255,255,.85); margin-top: 2px; }
+.id-left .un { font-size: 14px; color: rgba(255,255,255,.85); margin-top: 2px; word-break: break-word; }
 .role { display: inline-block; margin-top: 14px; font-size: 12px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; background: #fff; color: var(--red2); padding: 6px 16px; border-radius: 999px; }
 
 .id-right { padding: 30px 34px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
 .row { display: flex; align-items: center; gap: 16px; background: var(--card2); border-radius: 16px; padding: 14px 18px; }
+.row > div:last-child { min-width: 0; }
 .row .ico {
     flex: 0 0 46px; height: 46px; border-radius: 50%; background: var(--card);
     display: flex; align-items: center; justify-content: center; font-size: 19px; color: var(--gold);
@@ -162,9 +182,9 @@ a { color: inherit; }
 .row b { display: block; font-size: 16px; font-weight: 700; word-break: break-word; }
 
 /* ---------- STATS ---------- */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 22px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 14px; margin-top: 22px; }
 .stat { display: flex; align-items: center; gap: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px 20px; }
-.stat .e { width: 54px; height: 54px; border-radius: 50%; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: inset 0 0 0 2px rgba(255,183,3,.35); }
+.stat .e { flex: 0 0 54px; height: 54px; border-radius: 50%; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: inset 0 0 0 2px rgba(255,183,3,.35); }
 .stat span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
 .stat strong { display: block; font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 40px; letter-spacing: 1px; line-height: 1.05; }
 
@@ -182,7 +202,7 @@ a { color: inherit; }
     background: linear-gradient(90deg, var(--red), var(--red2)); color: #fff;
     font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; padding: 14px 16px; text-align: left;
 }
-.orders-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.orders-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; word-break: break-word; }
 .orders-table tr:last-child td { border-bottom: none; }
 .orders-table tbody tr { transition: .15s; }
 .orders-table tbody tr:hover { background: var(--card2); }
@@ -196,16 +216,38 @@ a { color: inherit; }
 .btn { display: inline-block; text-decoration: none; cursor: pointer; border: none; font-family: inherit; font-weight: 800; font-size: 14px; padding: 13px 28px; border-radius: 999px; background: var(--gold); color: #000; box-shadow: 0 4px 0 #b37f00; }
 .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b37f00; }
 
-@media (max-width: 800px) {
-    .idcard { grid-template-columns: 1fr; }
-    .id-left::after { display: none; }
-    .id-right { padding: 22px 18px; }
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px), (hover: none) {
+    body { background-attachment: scroll; }
+}
+@media (max-width: 900px) {
+    .hero { padding: 30px 0 20px; }
+    .orders { margin: 30px 0 50px; }
 
+    /* Table -> cards */
     .orders-table thead { display: none; }
     .orders-table, .orders-table tbody, .orders-table tr, .orders-table td { display: block; width: 100%; }
     .orders-table tr { padding: 12px 16px; border-bottom: 1px solid var(--line); }
     .orders-table td { display: flex; justify-content: space-between; gap: 12px; border: none; padding: 5px 0; text-align: right; }
-    .orders-table td::before { content: attr(data-label); color: var(--muted); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 800; text-align: left; }
+    .orders-table td::before { content: attr(data-label); flex: 0 0 auto; color: var(--muted); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 800; text-align: left; }
+}
+@media (max-width: 800px) {
+    .idcard { grid-template-columns: 1fr; }
+    .id-left::after { display: none; }
+    .id-left { padding: 28px 20px; }
+    .id-right { padding: 22px 18px; }
+}
+@media (max-width: 480px) {
+    .avatar { width: 120px; height: 120px; }
+    .id-left h2 { font-size: 28px; }
+    .row { padding: 12px 14px; gap: 12px; }
+    .row .ico { flex-basis: 40px; height: 40px; font-size: 17px; }
+    .row b { font-size: 15px; }
+    .stat { padding: 14px 16px; gap: 12px; }
+    .stat strong { font-size: 34px; }
+    .sec-title h3 { font-size: 34px; }
+    .empty { padding: 40px 16px; }
+    .empty h4 { font-size: 32px; }
 }
 </style>
 </head>
@@ -215,7 +257,8 @@ a { color: inherit; }
 <nav class="nav">
     <div class="wrap">
         <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
-        <div class="links">
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+        <div class="links" id="navLinks">
             <a href="index.php">Home</a>
             <a href="menu.php">Menu</a>
             <a href="cart.php">Cart</a>
@@ -340,6 +383,15 @@ document.addEventListener("DOMContentLoaded", function () {
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         });
         document.addEventListener("click", function () { menu.style.display = "none"; });
+    }
+
+    // Mobile hamburger menu
+    const toggle = document.getElementById("navToggle");
+    const links = document.getElementById("navLinks");
+    if (toggle && links) {
+        toggle.addEventListener("click", function () {
+            links.classList.toggle("open");
+        });
     }
 });
 </script>

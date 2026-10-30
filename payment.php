@@ -271,6 +271,8 @@ $cartEmpty = empty($cartItemN);
             font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
         }
 
+        html, body { overflow-x: hidden; }
+
         body {
             color: var(--text);
             min-height: 100vh;
@@ -279,7 +281,9 @@ $cartEmpty = empty($cartItemN);
             background-size: cover;
         }
 
-        /* ---------- TOP BAR (index.php jevu) ---------- */
+        img { max-width: 100%; }
+
+        /* ---------- TOP BAR ---------- */
         .topbar {
             position: sticky;
             top: 0;
@@ -306,6 +310,17 @@ $cartEmpty = empty($cartItemN);
             width: 40px;
             height: 40px;
             object-fit: contain;
+        }
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: 0;
+            color: #fff;
+            font-size: 30px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+            margin-left: auto;
         }
 
         .right-ul {
@@ -410,6 +425,7 @@ $cartEmpty = empty($cartItemN);
             gap: 24px;
             align-items: start;
         }
+        .checkout-grid > * { min-width: 0; }
         .form-col {
             display: flex;
             flex-direction: column;
@@ -448,6 +464,7 @@ $cartEmpty = empty($cartItemN);
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
+        .grid-2 > * { min-width: 0; }
         .field {
             display: flex;
             flex-direction: column;
@@ -582,6 +599,7 @@ $cartEmpty = empty($cartItemN);
             font-size: 22px;
             letter-spacing: 3px;
             color: #fff;
+            white-space: nowrap;
         }
         .cc-bottom {
             position: relative;
@@ -589,6 +607,7 @@ $cartEmpty = empty($cartItemN);
             justify-content: space-between;
             gap: 16px;
         }
+        .cc-bottom > div:first-child { min-width: 0; }
         .cc-bottom small {
             display: block;
             font-size: 10px;
@@ -603,6 +622,11 @@ $cartEmpty = empty($cartItemN);
             letter-spacing: 1px;
             text-transform: uppercase;
             color: #fff;
+        }
+        .cc-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* ---------- SUMMARY ---------- */
@@ -623,8 +647,9 @@ $cartEmpty = empty($cartItemN);
             padding: 12px 0;
             border-bottom: 1px dashed var(--line);
         }
+        .sum-items li > div:first-child { min-width: 0; }
         .sum-items li:last-child { border-bottom: none; }
-        .sum-name { font-weight: 600; font-size: 15px; }
+        .sum-name { font-weight: 600; font-size: 15px; word-break: break-word; }
         .sum-qty { color: var(--muted); font-size: 13px; margin-top: 3px; }
         .sum-price { font-weight: 700; color: var(--gold); white-space: nowrap; }
         .empty-cart { color: var(--muted); text-align: center; padding: 18px 0; }
@@ -706,18 +731,71 @@ $cartEmpty = empty($cartItemN);
         .hidden { display: none !important; }
 
         /* ---------- RESPONSIVE ---------- */
+
+        /* iPhone / touch: "fixed" background kaam nathi karto */
+        @media (max-width: 900px), (hover: none) {
+            body {
+                background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)),
+                            url('Assets/images.png') no-repeat center center scroll;
+                background-size: cover;
+            }
+        }
+
+        /* Tablet */
         @media (max-width: 900px) {
             .checkout-grid { grid-template-columns: 1fr; }
             .summary { position: static; }
+            .page { padding: 22px 16px 50px; }
         }
+
+        /* Mobile: hamburger menu */
+        @media (max-width: 800px) {
+            .topbar { flex-wrap: wrap; padding: 10px 15px; gap: 10px; }
+            .brand { font-size: 18px; }
+            .nav-toggle { display: block; }
+            .right-ul {
+                display: none;
+                order: 3;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+                padding: 10px 0 6px;
+                border-top: 1px solid #333;
+            }
+            .right-ul.open { display: flex; }
+            .right-ul > li { width: 100%; }
+            .right-ul > li > a { display: block; padding: 10px 0; font-size: 16px; }
+            .profile { margin-top: 6px; }
+            .dropdown { position: static; margin-top: 10px; width: 100%; box-shadow: none; }
+        }
+
         @media (max-width: 700px) {
-            .topbar { padding: 10px 15px; flex-wrap: wrap; }
-            .right-ul { gap: 14px; order: 3; width: 100%; justify-content: center; flex-wrap: wrap; }
-            .grid-2 { grid-template-columns: 1fr; }
-            .methods { grid-template-columns: 1fr; }
-            .page-title { font-size: 24px; }
-            .step-line { width: 25px; }
+            .grid-2 { grid-template-columns: 1fr; gap: 0; }
+            .grid-2 .field { margin-bottom: 14px; }
+            .methods { gap: 8px; }
+            .method-box { padding: 14px 6px; font-size: 13px; gap: 6px; }
+            .method-box i { font-size: 20px; }
+            .page-title { font-size: 24px; margin-bottom: 18px; }
+            .step { font-size: 13px; }
+            .step-line { width: 22px; }
+            .card { padding: 18px 16px; border-radius: 14px; }
             .cc-number { font-size: 18px; letter-spacing: 2px; }
+
+            /* 16px thi nana font par iPhone auto-zoom kare chhe */
+            .field input,
+            .field textarea { font-size: 16px; }
+        }
+
+        @media (max-width: 400px) {
+            .brand { font-size: 16px; }
+            .brand img { width: 32px; height: 32px; }
+            .methods { grid-template-columns: 1fr; }
+            .method-box { flex-direction: row; justify-content: flex-start; padding: 12px 16px; gap: 12px; }
+            .cc-preview { height: 180px; padding: 16px; }
+            .cc-number { font-size: 16px; letter-spacing: 1px; }
+            .cc-brand { font-size: 28px; }
+            .sum-total span:last-child { font-size: 22px; }
         }
     </style>
 </head>
@@ -728,8 +806,9 @@ $cartEmpty = empty($cartItemN);
             <img src="Assets/logo.png" alt="logo">
             <span>B K's Burger House</span>
         </a>
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
 
-        <ul class="right-ul">
+        <ul class="right-ul" id="navMenu">
             <li><a href="index.php">Home</a></li>
             <li><a href="menu.php">Menu</a></li>
             <li><a href="cart.php" class="active">Cart</a></li>
@@ -931,7 +1010,7 @@ $cartEmpty = empty($cartItemN);
     </main>
 
     <script>
-        // Profile dropdown
+        // Profile dropdown + mobile hamburger
         document.addEventListener("DOMContentLoaded", function () {
             const btn = document.getElementById("profileBtn");
             const menu = document.getElementById("dropMenu");
@@ -942,6 +1021,12 @@ $cartEmpty = empty($cartItemN);
             });
             document.addEventListener("click", function () {
                 menu.style.display = "none";
+            });
+
+            const navToggle = document.getElementById("navToggle");
+            const navMenu = document.getElementById("navMenu");
+            navToggle.addEventListener("click", function () {
+                navMenu.classList.toggle("open");
             });
         });
 

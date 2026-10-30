@@ -44,9 +44,10 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
                 radial-gradient(circle at 100% 100%, rgba(255,183,3,.14), transparent 40%),
                 var(--bg);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* ---------- HEADER (index.php jevo) ---------- */
+        /* ---------- HEADER ---------- */
         .header {
             background: #0b0b0b;
             font-family: 'Poppins', sans-serif;
@@ -56,7 +57,9 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
@@ -67,6 +70,7 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             text-decoration: none;
             font-size: 20px;
             font-weight: 700;
+            z-index: 1001;
         }
 
         .brand img {
@@ -79,7 +83,6 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             display: flex;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
         }
 
         .menu a {
@@ -94,11 +97,33 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             color: #ff4d4d;
         }
 
-        @media (max-width: 700px) {
-            .header { padding: 10px 16px; }
-            .menu { gap: 14px; }
-            .menu a { font-size: 14px; }
-            .brand { font-size: 17px; }
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* ---------- MAIN ---------- */
@@ -218,10 +243,156 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             box-shadow: 0 1px 0 var(--red2);
         }
 
-        @media (max-width: 520px) {
-            .ticket { padding: 32px 22px 28px; }
-            .cut { margin: 20px -22px; }
-            .ticket h1 { font-size: 44px; }
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablets */
+        @media (max-width: 900px) {
+            .header { padding: 12px 28px; }
+            .page { padding: 36px 18px 60px; }
+        }
+
+        /* Mobile landscape / large phones */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 18px;
+            }
+
+            .hamburger { display: flex; }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 90px 30px 40px;
+                gap: 8px;
+                transition: right .35s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,.5);
+                z-index: 999;
+            }
+
+            .menu.open { right: 0; }
+
+            .menu a {
+                font-size: 18px;
+                padding: 12px 0;
+                width: 100%;
+                border-bottom: 1px solid #222;
+            }
+
+            .page {
+                padding: 30px 16px 50px;
+            }
+
+            .ticket {
+                padding: 34px 26px 30px;
+                border-radius: 22px;
+            }
+
+            .ticket::before,
+            .ticket::after {
+                width: 28px;
+                height: 28px;
+                margin-top: -14px;
+            }
+
+            .ticket::before { left: -14px; }
+            .ticket::after  { right: -14px; }
+
+            .emoji {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+                border-width: 4px;
+            }
+
+            .ticket h1 {
+                font-size: 44px;
+            }
+
+            .cut {
+                margin: 18px -26px;
+            }
+
+            .count {
+                font-size: clamp(70px, 20vw, 120px);
+                -webkit-text-stroke: 2.5px var(--red);
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .brand { font-size: 16px; gap: 8px; }
+            .brand img { width: 32px; height: 32px; }
+
+            .page {
+                padding: 24px 14px 40px;
+            }
+
+            .ticket {
+                padding: 28px 18px 26px;
+                border-radius: 18px;
+            }
+
+            .ticket::before,
+            .ticket::after {
+                display: none;
+            }
+
+            .emoji {
+                width: 72px;
+                height: 72px;
+                font-size: 36px;
+                margin-bottom: 10px;
+            }
+
+            .tag {
+                font-size: 10px;
+                letter-spacing: 2.5px;
+            }
+
+            .ticket h1 {
+                font-size: 36px;
+                letter-spacing: 1px;
+            }
+
+            .cut {
+                margin: 16px -18px;
+            }
+
+            .count {
+                font-size: clamp(60px, 22vw, 90px);
+                -webkit-text-stroke: 2px var(--red);
+            }
+
+            .sub {
+                font-size: 13px;
+            }
+
+            .home-btn {
+                margin-top: 22px;
+                padding: 13px 28px;
+                font-size: 14px;
+                width: 100%;
+                max-width: 260px;
+            }
+        }
+
+        /* Extra small */
+        @media (max-width: 360px) {
+            .ticket h1 { font-size: 30px; }
+            .count {
+                font-size: 54px;
+            }
+            .emoji {
+                width: 64px;
+                height: 64px;
+                font-size: 32px;
+            }
         }
     </style>
 </head>
@@ -233,7 +404,13 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
             <span>B K's Burger House</span>
         </a>
 
-        <div class="menu">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="menu" id="navMenu">
             <a href="index.php">Home</a>
             <a href="dashboard.php">Dashboard</a>
             <a href="sales.php">Sales</a>
@@ -257,6 +434,22 @@ $happy_customers = $row ? (int)$row['happy_customers'] : 0;
     </div>
 
     <script>
+        /* Hamburger menu */
+        const hamburger = document.getElementById("hamburger");
+        const navMenu = document.getElementById("navMenu");
+
+        hamburger.addEventListener("click", function () {
+            hamburger.classList.toggle("active");
+            navMenu.classList.toggle("open");
+        });
+
+        navMenu.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                hamburger.classList.remove("active");
+                navMenu.classList.remove("open");
+            });
+        });
+
         // Number 0 thi shuru thai ne dhire dhire vadhe (animation)
         (function () {
             const el = document.getElementById("count");

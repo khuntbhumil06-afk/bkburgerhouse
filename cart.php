@@ -159,14 +159,17 @@ body {
         radial-gradient(circle at 100% 100%, rgba(255,183,3,.14), transparent 40%),
         var(--bg);
     background-attachment: fixed;
+    overflow-x: hidden;
 }
+img { max-width: 100%; }
 a { color: inherit; }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
-/* ---------- NAV (index.php jevo header) ---------- */
+/* ---------- NAV ---------- */
 .nav {
     background: #0b0b0b;
     font-family: 'Poppins', sans-serif;
+    position: sticky; top: 0; z-index: 500;
 }
 .nav .wrap {
     max-width: none;
@@ -178,6 +181,10 @@ a { color: inherit; }
     font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0;
 }
 .brand img { width: 38px; height: 38px; object-fit: contain; }
+.nav-toggle {
+    display: none; background: none; border: 0; color: #fff;
+    font-size: 30px; line-height: 1; cursor: pointer; padding: 0 4px; margin-left: auto;
+}
 .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .links > a {
     text-decoration: none; color: #fff; font-family: 'Poppins', sans-serif;
@@ -189,11 +196,23 @@ a { color: inherit; }
 .dropdown { display: none; position: absolute; right: 0; top: 52px; min-width: 150px; background: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); z-index: 200; }
 .dropdown a { display: block; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; }
 .dropdown a:hover { background: var(--red2); }
-@media (max-width: 700px) {
+
+@media (max-width: 800px) {
     .nav .wrap { padding: 10px 16px; }
-    .links { gap: 16px; }
-    .links > a { font-size: 15px; }
     .brand { font-size: 18px; }
+    .nav-toggle { display: block; }
+    .links {
+        display: none; width: 100%; flex-direction: column; align-items: flex-start;
+        gap: 4px; padding: 10px 0 6px; border-top: 1px solid #333;
+    }
+    .links.open { display: flex; }
+    .links > a { font-size: 16px; padding: 10px 0; width: 100%; }
+    .profile { margin: 6px 0 0; width: 100%; }
+    .dropdown { position: static; margin-top: 10px; width: 100%; box-shadow: none; }
+}
+@media (max-width: 380px) {
+    .brand { font-size: 16px; }
+    .brand img { width: 32px; height: 32px; }
 }
 
 /* ---------- HERO ---------- */
@@ -204,6 +223,7 @@ a { color: inherit; }
 
 /* ---------- LAYOUT ---------- */
 .layout { display: grid; grid-template-columns: 1fr 350px; gap: 26px; align-items: start; padding-bottom: 80px; }
+.layout > * { min-width: 0; }
 .list { display: grid; gap: 16px; }
 
 /* ---------- CART ITEM ---------- */
@@ -212,10 +232,11 @@ a { color: inherit; }
     background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px;
     transition: .25s;
 }
+.item > div { min-width: 0; }
 .item:hover { border-color: var(--gold); }
 .item .pic { width: 120px; height: 120px; border-radius: 18px; overflow: hidden; background: var(--card2); box-shadow: 0 8px 20px rgba(0,0,0,.45); }
 .item .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.item h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: 1.2px; line-height: 1.1; }
+.item h3 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: 1.2px; line-height: 1.1; word-break: break-word; }
 .unit { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .chip { font-size: 12px; font-weight: 600; background: var(--card2); border-radius: 999px; padding: 4px 11px; }
@@ -245,7 +266,7 @@ a { color: inherit; }
 .bill .tag { font-size: 11px; letter-spacing: 3px; font-weight: 800; color: var(--red); }
 .bill h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 42px; letter-spacing: 1.5px; line-height: 1; margin: 2px 0 16px; }
 .bill .cut { border-top: 2px dashed #c9b88f; margin: 0 -26px 16px; }
-.row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+.row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 14px; }
 .row b { font-family: Arial, sans-serif; }
 .row.minus b { color: #15803d; }
 .pay { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid var(--paper-ink); margin-top: 8px; padding-top: 12px; }
@@ -270,15 +291,38 @@ a { color: inherit; }
 .empty p { color: var(--muted); margin: 6px 0 24px; }
 .empty .btn { display: inline-block; width: auto; padding: 13px 30px; margin: 0; border-radius: 999px; background: var(--gold); color: #000; box-shadow: 0 4px 0 #b37f00; }
 
-@media (max-width: 900px) {
-    .layout { grid-template-columns: 1fr; }
-    .bill { position: relative; top: 0; }
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px), (hover: none) {
+    body { background-attachment: scroll; }
 }
-@media (max-width: 560px) {
-    .item { grid-template-columns: 90px 1fr; }
-    .item .pic { width: 90px; height: 90px; }
+@media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; padding-bottom: 50px; }
+    .bill { position: relative; top: 0; }
+    .hero { padding: 28px 0 18px; }
+}
+@media (max-width: 640px) {
+    .item { grid-template-columns: 90px 1fr; padding: 14px; gap: 14px; }
+    .item .pic { width: 90px; height: 90px; border-radius: 14px; }
     .item h3 { font-size: 22px; }
-    .side { grid-column: 1 / -1; grid-auto-flow: column; justify-content: space-between; align-items: center; justify-items: stretch; text-align: left; }
+    .side {
+        grid-column: 1 / -1;
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+        gap: 10px; text-align: left;
+        border-top: 1px dashed var(--line); padding-top: 12px;
+    }
+    .amount { font-size: 28px; }
+    .stepper button { width: 36px; height: 36px; }
+    .del { padding: 8px 4px; font-size: 13px; }
+}
+@media (max-width: 400px) {
+    .item { grid-template-columns: 76px 1fr; }
+    .item .pic { width: 76px; height: 76px; }
+    .bill { padding: 24px 18px 22px; }
+    .bill .cut { margin: 0 -18px 16px; }
+    .bill h2 { font-size: 36px; }
+    .pay strong { font-size: 28px; }
+    .empty { padding: 44px 16px; }
+    .empty h2 { font-size: 36px; }
 }
 </style>
 </head>
@@ -287,7 +331,8 @@ a { color: inherit; }
 <nav class="nav">
     <div class="wrap">
         <a class="brand" href="index.php"><img src="Assets/logo.png" alt="logo"> <span>B K's Burger House</span></a>
-        <div class="links">
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+        <div class="links" id="navLinks">
             <a href="index.php">Home</a>
             <a href="menu.php">Menu</a>
             <a href="cart.php">Cart</a>
@@ -408,6 +453,15 @@ document.addEventListener("DOMContentLoaded", function () {
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         });
         document.addEventListener("click", function () { menu.style.display = "none"; });
+    }
+
+    // Mobile hamburger menu
+    const toggle = document.getElementById("navToggle");
+    const links = document.getElementById("navLinks");
+    if (toggle && links) {
+        toggle.addEventListener("click", function () {
+            links.classList.toggle("open");
+        });
     }
 });
 
